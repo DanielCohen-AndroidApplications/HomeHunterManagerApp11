@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Home Hunter Manager App 1.1</string>
+    <string-array name="pay_periods">
+        <item>Monthly</item>
+        <item>Weekly</item>
+    </string-array>
+
 </resources>

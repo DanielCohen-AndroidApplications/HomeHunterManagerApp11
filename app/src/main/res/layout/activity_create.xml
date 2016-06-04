@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000">
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -43,20 +47,218 @@
         android:ems="10"
         android:id="@+id/editTextLocation"
         android:layout_gravity="center_horizontal"
-        android:hint="Enter property address here"/>
+        android:hint="Enter property address here"
+        android:textColorHint="#7a7a7a"
+        android:textColor="#a7a7a7"/>
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:hint="Square Footage"
+        android:ems="10"
+        android:id="@+id/editTextSqft"
+        android:layout_gravity="center_horizontal"
+        android:textColorHint="#7a7a7a"
+        android:textColor="#a7a7a7" />
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="horizontal" android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="left"
+        android:background="#000000"
+        >
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:hint="Rent"
+        android:ems="10"
+        android:id="@+id/editTextRent"
+        android:layout_gravity="center_horizontal"
+        android:textColorHint="#7a7a7a"
+        android:textColor="#a7a7a7" />
 
+
+
+        <Spinner
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/spinnerPayPeriod"
+            android:layout_gravity="center_horizontal"
+            android:backgroundTint="#7a7a7a"
+            />
+    </LinearLayout>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:hint="Minimum Salary"
+        android:ems="10"
+        android:id="@+id/editTextMinSalary"
+        android:textColorHint="#7a7a7a"
+        android:textColor="#a7a7a7" />
+
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:id="@+id/editTextShort"
+        android:layout_gravity="center_horizontal"
+        android:hint="Enter a short (about 1 sentence) description of the property here"
+        android:textColorHint="#7a7a7a"
+        android:textColor="#a7a7a7" />
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:id="@+id/editTextLong"
+        android:layout_gravity="center_horizontal"
+        android:hint="Enter a longer (about 1-2 paragraph) description of the property here"
+        android:textColorHint="#7a7a7a"
+        android:textColor="#a7a7a7" />
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="horizontal" android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="left">
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:hint="# Bedrooms"
+        android:ems="10"
+        android:id="@+id/editTextBed"
+        android:layout_gravity="center_horizontal"
+        android:textColorHint="#7a7a7a"
+        android:textColor="#a7a7a7" />
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:hint="# Bathrooms"
+        android:ems="10"
+        android:id="@+id/editTextBath"
+        android:layout_gravity="center_horizontal"
+        android:textColorHint="#7a7a7a"
+        android:textColor="#a7a7a7" />
+    </LinearLayout>
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="horizontal" android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="left"
+        android:background="#6b6b6b">
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Couples OK"
+        android:id="@+id/checkBoxCouples"
+        android:textColor="#000"
+        android:textColorLink="#a7a7a7"
+        android:textColorHighlight="#a7a7a7"
+        android:background="#6b6b6b"/>
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Children OK"
+        android:id="@+id/checkBoxChildren"
+        android:textColor="#000"
+        android:textColorLink="#a7a7a7"
+        android:textColorHighlight="#a7a7a7"
+        android:background="#6b6b6b"
+        />
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Small Dogs OK"
+            android:id="@+id/checkBoxSmallDogs"
+            android:textColor="#000"
+            android:textColorLink="#a7a7a7"
+            android:textColorHighlight="#a7a7a7"
+            android:background="#6b6b6b"/>
+
+    </LinearLayout>
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="horizontal" android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="left"
+        android:background="#6b6b6b">
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="All Dogs OK"
+            android:id="@+id/checkBoxDogs"
+            android:textColor="#000"
+            android:textColorLink="#a7a7a7"
+            android:textColorHighlight="#a7a7a7"
+            android:background="#6b6b6b"/>
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cats OK"
+            android:id="@+id/checkBoxCats"
+            android:textColor="#000"
+            android:textColorLink="#a7a7a7"
+            android:textColorHighlight="#a7a7a7"
+            android:background="#6b6b6b"
+            />
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Smoking OK"
+            android:id="@+id/checkBoxSmoking"
+            android:textColor="#000"
+            android:textColorLink="#a7a7a7"
+            android:textColorHighlight="#a7a7a7"
+            android:background="#6b6b6b"/>
+
+    </LinearLayout>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="horizontal" android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="left"
+        android:background="#6b6b6b">
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Guarantor OK"
+            android:id="@+id/checkBoxGuarantor"
+            android:textColor="#000"
+            android:textColorLink="#a7a7a7"
+            android:textColorHighlight="#a7a7a7"
+            android:background="#6b6b6b"/>
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Security Deposit"
+            android:id="@+id/checkBoxDeposit"
+            android:textColor="#000"
+            android:textColorLink="#a7a7a7"
+            android:textColorHighlight="#a7a7a7"
+            android:background="#6b6b6b"
+            />
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Doorman"
+            android:id="@+id/checkBoxDoorman"
+            android:textColor="#000"
+            android:textColorLink="#a7a7a7"
+            android:textColorHighlight="#a7a7a7"
+            android:background="#6b6b6b"/>
+
+    </LinearLayout>
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="New Button"
-        android:id="@+id/locationBtn"
+        android:text="Submit"
+        android:id="@+id/submitBtn"
         android:layout_gravity="center_horizontal"
-        android:onClick="enterAddress"/>
-
-    <fragment
-        class="com.google.android.gms.maps.MapFragment"
-        android:id="@+id/map"
-        android:layout_width="match_parent"
-        android:layout_height="250dp"
-        />
+        android:onClick="submitInfo"/>
 </LinearLayout>
+</ScrollView>
