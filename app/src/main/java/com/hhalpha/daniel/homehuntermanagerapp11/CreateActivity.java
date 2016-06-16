@@ -48,6 +48,7 @@ public class CreateActivity extends Activity {
     String address, shortBlurb, bigBlurb, payPeriod, minSalary,beds, baths, sqft, rent;
 
     Boolean guarantor, dogs, smallDogs, cats, couples, children, smoking, securityDeposit, doorman;
+    ArrayList<Boolean> booleans;
     File pic1, pic2, pic3, pic4;
 
     @Override
@@ -211,74 +212,78 @@ public class CreateActivity extends Activity {
     public void submitInfo(View v){
         Bundle bundle = new Bundle();
         ArrayList<String> arrayList = new ArrayList<String>();
-        arrayList.add("hey dan");
+        booleans=new ArrayList<Boolean>();
+        if (checkBoxCouples.isChecked()) {
+            couples = true;
+        } else {
+            couples = false;
+        }
+        booleans.add(couples);
+        if (checkBoxChildren.isChecked()) {
+            children = true;
+        } else {
+            children = false;
+        }
+        booleans.add(children);
+        if (checkBoxSmallDogs.isChecked()) {
+            smallDogs = true;
+        } else {
+            smallDogs = false;
+        }
+        booleans.add(smallDogs);
+        if (checkBoxDogs.isChecked()) {
+            dogs = true;
+        } else {
+            dogs = false;
+        }
+        booleans.add(dogs);
+
+        if (checkBoxCats.isChecked()) {
+            cats = true;
+        } else {
+            cats = false;
+        }
+        booleans.add(cats);
+
+        if (checkBoxSmoking.isChecked()) {
+            smoking = true;
+        } else {
+            smoking = false;
+        }
+        booleans.add(smoking);
+
+        if (checkBoxGuarantor.isChecked()) {
+            guarantor = true;
+        } else {
+            guarantor = false;
+        }
+        booleans.add(guarantor);
+        if (checkBoxDeposit.isChecked()) {
+            securityDeposit = true;
+        } else {
+            securityDeposit = false;
+        }
+        booleans.add(securityDeposit);
+        if (checkBoxDoorman.isChecked()) {
+            doorman = true;
+        } else {
+            doorman = false;
+        }
+        booleans.add(doorman);
+
         arrayList.add(editTextLocation.getText().toString());
         for(int i=0;i<editTexts.size();i++){
             arrayList.add(editTexts.get(i).getText().toString());
         }
+        try {
+            for (int i = 0; i < booleans.size(); i++) {
+                arrayList.add(booleans.get(i).toString());
+            }
+        }catch (Exception e){
+            Log.v("_dan", e.getMessage());
+        }
         bundle.putStringArrayList("arrayList",arrayList);
 
-// try {
-//            address = editTextLocation.getText().toString();
-//            sqft = editTextSqft.getText().toString();
-//            rent = editTextRent.getText().toString();
-//            minSalary = editTextMinSalary.getText().toString();
-//            shortBlurb = editTextShort.getText().toString();
-//            bigBlurb = editTextLong.getText().toString();
-//            beds = editTextBed.getText().toString();
-//            baths = editTextBath.getText().toString();
-//
-//            if (checkBoxCouples.isChecked()) {
-//                couples = true;
-//            } else {
-//                couples = false;
-//            }
-//            if (checkBoxChildren.isChecked()) {
-//                children = true;
-//            } else {
-//                children = false;
-//            }
-//            if (checkBoxSmallDogs.isChecked()) {
-//                smallDogs = true;
-//            } else {
-//                smallDogs = false;
-//            }
-//            if (checkBoxDogs.isChecked()) {
-//                dogs = true;
-//            } else {
-//                dogs = false;
-//            }
-//
-//            if (checkBoxCats.isChecked()) {
-//                cats = true;
-//            } else {
-//                cats = false;
-//            }
-//
-//            if (checkBoxSmoking.isChecked()) {
-//                smoking = true;
-//            } else {
-//                smoking = false;
-//            }
-//
-//            if (checkBoxGuarantor.isChecked()) {
-//                guarantor = true;
-//            } else {
-//                guarantor = false;
-//            }
-//            if (checkBoxDeposit.isChecked()) {
-//                securityDeposit = true;
-//            } else {
-//                securityDeposit = false;
-//            }
-//            if (checkBoxDoorman.isChecked()) {
-//                doorman = true;
-//            } else {
-//                doorman = false;
-//            }
-//        }catch(Exception e){
-//            Log.v("dan_1", e.getMessage());
-//        }
         Intent i = new Intent (CreateActivity.this, ConfirmActivity.class);
         i.putExtra("bundle",bundle);
 //        try {
