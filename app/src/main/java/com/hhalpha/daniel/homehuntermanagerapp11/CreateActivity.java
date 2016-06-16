@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -50,7 +51,8 @@ public class CreateActivity extends Activity {
     Boolean guarantor, dogs, smallDogs, cats, couples, children, smoking, securityDeposit, doorman;
     ArrayList<Boolean> booleans;
     File pic1, pic2, pic3, pic4;
-
+    String path1, path2, path3, path4;
+    Uri uri1, uri2, uri3, uri4;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,6 +75,10 @@ public class CreateActivity extends Activity {
         editTexts.add(editTextShort);
         editTextLong=(EditText) findViewById(R.id.editTextLong);
         editTexts.add(editTextLong);
+        editTextBed=(EditText) findViewById(R.id.editTextBed);
+        editTexts.add(editTextBed);
+        editTextBath=(EditText) findViewById(R.id.editTextBath);
+        editTexts.add(editTextBath);
         submitBtn=(Button) findViewById(R.id.submitBtn);
         numberPics=1;
         spinnerPayPeriods = (Spinner) findViewById(R.id.spinnerPayPeriod);
@@ -122,8 +128,11 @@ public class CreateActivity extends Activity {
                             numberPics++;
 
                             try{
-                                pic1 = new File(getApplicationContext().getCacheDir(), selectedImage.toString());
+                                pic1 = new File(Environment.getExternalStoragePublicDirectory(
+                                        Environment.DIRECTORY_PICTURES), selectedImage.toString());
                                 pic1.createNewFile();
+                                path1=pic1.getPath();
+                                uri1=imageUri;
                             }catch(Exception e){
                                 Log.v("_dan create img1", e.getMessage());
                             }
@@ -140,8 +149,11 @@ public class CreateActivity extends Activity {
                             numberPics++;
 
                             try{
-                                pic2 = new File(getApplicationContext().getCacheDir(), selectedImage.toString());
+                                pic2 = new File(Environment.getExternalStoragePublicDirectory(
+                                        Environment.DIRECTORY_PICTURES), selectedImage.toString());
                                 pic2.createNewFile();
+                                path2=pic2.getPath();
+                                uri2=imageUri;
                             }catch(Exception e){
                                 Log.v("_dan create img2", e.getMessage());
                             }
@@ -158,8 +170,11 @@ public class CreateActivity extends Activity {
                             numberPics++;
 
                             try{
-                                pic3 = new File(getApplicationContext().getCacheDir(), selectedImage.toString());
+                                pic3 = new File(Environment.getExternalStoragePublicDirectory(
+                                        Environment.DIRECTORY_PICTURES), selectedImage.toString());
                                 pic3.createNewFile();
+                                path3=pic3.getPath();
+                                uri3=imageUri;
                             }catch(Exception e){
                                 Log.v("_dan create img3", e.getMessage());
                             }
@@ -177,8 +192,11 @@ public class CreateActivity extends Activity {
                             picsBtn.setText("You've reached the maximum 4 pics");
 
                             try{
-                                pic4 = new File(getApplicationContext().getCacheDir(), selectedImage.toString());
+                                pic4 = new File(Environment.getExternalStoragePublicDirectory(
+                                        Environment.DIRECTORY_PICTURES), selectedImage.toString());
                                 pic4.createNewFile();
+                                path4=pic4.getPath();
+                                uri4=imageUri;
                             }catch(Exception e){
                                 Log.v("_dan create img4", e.getMessage());
                             }
@@ -282,6 +300,10 @@ public class CreateActivity extends Activity {
         }catch (Exception e){
             Log.v("_dan", e.getMessage());
         }
+        arrayList.add(uri1.toString());
+        arrayList.add(uri2.toString());
+        arrayList.add(uri3.toString());
+        arrayList.add(uri4.toString());
         bundle.putStringArrayList("arrayList",arrayList);
 
         Intent i = new Intent (CreateActivity.this, ConfirmActivity.class);

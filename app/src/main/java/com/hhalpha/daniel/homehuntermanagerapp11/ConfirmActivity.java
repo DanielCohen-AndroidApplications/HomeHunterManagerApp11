@@ -1,10 +1,15 @@
 package com.hhalpha.daniel.homehuntermanagerapp11;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.amazonaws.AmazonClientException;
@@ -67,6 +72,11 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -89,6 +99,8 @@ public class ConfirmActivity extends Activity implements OnMapReadyCallback {
     DynamoDBMapper mapper;
     AmazonDynamoDB dynamoDB;
     Property property;
+    ImageView imageView5, imageView6, imageView7, imageView8;
+    File pic1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -320,7 +332,16 @@ public class ConfirmActivity extends Activity implements OnMapReadyCallback {
         textViewGuarantor=(TextView) findViewById(R.id.textViewGuarantor);
         textViewSecurity=(TextView) findViewById(R.id.textViewSecurity);
         textViewDoorman=(TextView) findViewById(R.id.textViewDoorman);
-
+        imageView5=(ImageView) findViewById(R.id.imageView5);
+        imageView6=(ImageView) findViewById(R.id.imageView6);
+        imageView7=(ImageView) findViewById(R.id.imageView7);
+        imageView8=(ImageView) findViewById(R.id.imageView8);
+//        try {
+//            FileInputStream fis = new FileInputStream(new File(getCacheDir(), arrayList.get(-1)));
+//
+//        }catch (Exception e){
+//            Log.v("_dan", e.getMessage());
+//        }
         credentialsProvider = new CognitoCachingCredentialsProvider(
                 getApplicationContext(),
                 "us-east-1:ceae0626-1082-4759-85c3-fae01752889a", // Identity Pool ID
@@ -402,11 +423,35 @@ public class ConfirmActivity extends Activity implements OnMapReadyCallback {
             } else if(arrayList.get(15).equals("false")) {
                 textViewSecurity.setText("No Security Deposit");
             }
-            if(arrayList.get(15).equals("true")) {
+            if(arrayList.get(16).equals("true")) {
                 textViewDoorman.setText("Doorman");
-            } else if(arrayList.get(15).equals("false")) {
+            } else if(arrayList.get(16).equals("false")) {
                 textViewDoorman.setText("No Doorman");
             }
+
+            Uri uri1 = Uri.parse(arrayList.get(18));
+            InputStream imageStream = getContentResolver().openInputStream(uri1);
+            Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            selectedImage.compress(Bitmap.CompressFormat.PNG, 100 /*ignored for PNG*/, bos);
+            byte[] bitmapdata = bos.toByteArray();
+            imageView5.setImageBitmap(selectedImage);
+            try{
+                pic1 = new File(Environment.getExternalStoragePublicDirectory(
+                        Environment.DIRECTORY_PICTURES), uri1.toString());
+                pic1.createNewFile();
+            }catch(Exception e){
+                Log.v("_dan create img1", e.getMessage());
+            }
+            FileOutputStream fos = new FileOutputStream(pic1);
+            try {
+                fos.write(bitmapdata);
+                fos.flush();
+                fos.close();
+            }catch(Exception e){
+                Log.v("_dan fos1", e.getMessage());
+            }
+
         }catch (Exception e ){
             Log.v("_dan", e.getMessage());
         }
