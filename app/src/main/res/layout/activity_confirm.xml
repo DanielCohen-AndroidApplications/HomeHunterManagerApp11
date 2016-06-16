@@ -18,14 +18,19 @@
             android:id="@+id/imageView5" />
 
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:id="@+id/imageView6" />
 
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:id="@+id/imageView7" />
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:id="@+id/imageView8"
+            android:layout_gravity="center_horizontal" />
     </LinearLayout>
     <fragment
         class="com.google.android.gms.maps.MapFragment"
@@ -36,11 +41,7 @@
 
 
 
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/imageView8"
-        android:layout_gravity="center_horizontal" />
+
 
     <TextView
         android:layout_width="wrap_content"
