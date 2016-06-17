@@ -131,7 +131,7 @@ public class CreateActivity extends Activity {
                                 pic1 = new File(Environment.getExternalStoragePublicDirectory(
                                         Environment.DIRECTORY_PICTURES), selectedImage.toString());
                                 pic1.createNewFile();
-                                path1=pic1.getPath();
+                                path1=selectedImage.toString();
                                 uri1=imageUri;
                             }catch(Exception e){
                                 Log.v("_dan create img1", e.getMessage());
@@ -304,6 +304,10 @@ public class CreateActivity extends Activity {
         arrayList.add(uri2.toString());
         arrayList.add(uri3.toString());
         arrayList.add(uri4.toString());
+        arrayList.add(path1.toString());
+        arrayList.add(path2.toString());
+        arrayList.add(path3.toString());
+        arrayList.add(path4.toString());
         bundle.putStringArrayList("arrayList",arrayList);
         //TODO:Handle situations where fields are left blank/less than 3 photos are added
         Intent i = new Intent (CreateActivity.this, ConfirmActivity.class);

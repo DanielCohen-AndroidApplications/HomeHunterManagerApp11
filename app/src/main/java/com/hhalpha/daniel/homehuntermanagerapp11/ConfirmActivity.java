@@ -118,6 +118,8 @@ public class ConfirmActivity extends Activity implements OnMapReadyCallback {
     ImageView imageView5, imageView6, imageView7, imageView8;
     File pic1, pic2, pic3, pic4;
     Double lat, lng;
+    Uri uri1, uri2, uri3, uri4;
+    Bitmap selectedImage, selectedImage2,selectedImage3,selectedImage4;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -369,11 +371,7 @@ public class ConfirmActivity extends Activity implements OnMapReadyCallback {
         mapper = new DynamoDBMapper(ddbClient);
         property = new Property();
 
-        s3 = new AmazonS3Client(credentialsProvider);
 
-        // Set the region of your S3 bucket
-        s3.setRegion(Region.getRegion(Regions.US_EAST_1));
-        transferUtility = new TransferUtility(s3, getApplicationContext());
 
 
 
@@ -388,6 +386,8 @@ public class ConfirmActivity extends Activity implements OnMapReadyCallback {
             address=arrayList.get(0);
 
             new latLngFromAddressTask().execute(address);
+
+
 
             textViewSqft.setText(arrayList.get(1)+" Sqft");
             textViewRent.setText("Rent:"+arrayList.get(2));
@@ -442,18 +442,18 @@ public class ConfirmActivity extends Activity implements OnMapReadyCallback {
                 textViewDoorman.setText("No Doorman");
             }
 
-            Uri uri1 = Uri.parse(arrayList.get(18));
-            Uri uri2 = Uri.parse(arrayList.get(19));
-            Uri uri3 = Uri.parse(arrayList.get(20));
-            Uri uri4 = Uri.parse(arrayList.get(21));
+            uri1 = Uri.parse(arrayList.get(18));
+            uri2 = Uri.parse(arrayList.get(19));
+            uri3 = Uri.parse(arrayList.get(20));
+            uri4 = Uri.parse(arrayList.get(21));
             InputStream imageStream = getContentResolver().openInputStream(uri1);
             InputStream imageStream2 = getContentResolver().openInputStream(uri2);
             InputStream imageStream3 = getContentResolver().openInputStream(uri3);
             InputStream imageStream4 = getContentResolver().openInputStream(uri4);
-            Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
-            Bitmap selectedImage2 = BitmapFactory.decodeStream(imageStream2);
-            Bitmap selectedImage3 = BitmapFactory.decodeStream(imageStream3);
-            Bitmap selectedImage4 = BitmapFactory.decodeStream(imageStream4);
+            selectedImage = BitmapFactory.decodeStream(imageStream);
+            selectedImage2 = BitmapFactory.decodeStream(imageStream2);
+            selectedImage3 = BitmapFactory.decodeStream(imageStream3);
+            selectedImage4 = BitmapFactory.decodeStream(imageStream4);
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             ByteArrayOutputStream bos2 = new ByteArrayOutputStream();
             ByteArrayOutputStream bos3 = new ByteArrayOutputStream();
@@ -462,29 +462,46 @@ public class ConfirmActivity extends Activity implements OnMapReadyCallback {
             selectedImage2.compress(Bitmap.CompressFormat.PNG, 100, bos2);
             selectedImage3.compress(Bitmap.CompressFormat.PNG, 100, bos3);
             selectedImage4.compress(Bitmap.CompressFormat.PNG, 100, bos4);
+
             byte[] bitmapdata = bos.toByteArray();
             byte[] bitmapdata2 = bos2.toByteArray();
             byte[] bitmapdata3 = bos3.toByteArray();
             byte[] bitmapdata4 = bos4.toByteArray();
+
             imageView5.setImageBitmap(selectedImage);
             imageView6.setImageBitmap(selectedImage2);
             imageView7.setImageBitmap(selectedImage3);
             imageView8.setImageBitmap(selectedImage4);
+
+            pic1 = new File(getApplicationContext().getCacheDir(), "pic117jun2016_1");
+            pic1.createNewFile();
+            FileOutputStream fos = new FileOutputStream(pic1);
+            try {
+                fos.write(bitmapdata);
+                fos.flush();
+                fos.close();
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+            //TODO get image files from External Storage
 //            try{
 //                pic1 = new File(Environment.getExternalStoragePublicDirectory(
-//                        Environment.DIRECTORY_PICTURES), uri1.toString());
+//                        Environment.DIRECTORY_PICTURES), selectedImage.toString());
 //                pic1.createNewFile();
+//
 //                pic2 = new File(Environment.getExternalStoragePublicDirectory(
-//                        Environment.DIRECTORY_PICTURES), uri2.toString());
+//                        Environment.DIRECTORY_PICTURES), selectedImage2.toString());
 //                pic2.createNewFile();
+//
 //                pic3 = new File(Environment.getExternalStoragePublicDirectory(
-//                        Environment.DIRECTORY_PICTURES), uri3.toString());
+//                        Environment.DIRECTORY_PICTURES), selectedImage3.toString());
 //                pic3.createNewFile();
-//                pic4 = new File(Environment.getExternalStoragePublicDirectory(
-//                        Environment.DIRECTORY_PICTURES), uri4.toString());
+//
+//                pic1 = new File(Environment.getExternalStoragePublicDirectory(
+//                        Environment.DIRECTORY_PICTURES), selectedImage4.toString());
 //                pic4.createNewFile();
 //            }catch(Exception e){
-//                Log.v("_dan create img", e.getMessage());
+//                Log.v("_dan create img confirm", e.getMessage());
 //            }
 //            FileOutputStream fos = new FileOutputStream(pic1);
 //            FileOutputStream fos2 = new FileOutputStream(pic2);
@@ -504,7 +521,7 @@ public class ConfirmActivity extends Activity implements OnMapReadyCallback {
 //                fos4.flush();
 //                fos4.close();
 //            }catch(Exception e){
-//                Log.v("_dan fos", e.getMessage());
+//                Log.v("_dan fos confirm", e.getMessage());
 //            }
 
         }catch (Exception e ){
@@ -531,6 +548,7 @@ public class ConfirmActivity extends Activity implements OnMapReadyCallback {
     }
     public void confirm(View v){
         try {
+
             new dataTask().execute();
         }catch (Exception e){
             Log.v("_dan confirm",e.getMessage());
@@ -547,27 +565,23 @@ public class ConfirmActivity extends Activity implements OnMapReadyCallback {
                 property.setDataString(arrayList.toString());
                 mapper.save(property);
                 //TODO put pics in S3
-//                mapper.notify();
-//                C:\Users\Daniel\Desktop\DanTest1-aws-my-sample-app-android\DanAwsTest\app\src\main\res\raw\pic1.PNG
-//                //S3: upload pic to "hhproperties" S3 Bucket
-//
-//                Uri pic1_path = Uri.parse("android.resource://"+getPackageName()+"/raw/pic1");
-//                File pic1 = new File(pic1_path.toString());
-//                TransferObserver observer = transferUtility.upload(
-//                        "hhproperties",     /* The bucket to upload to */
-//                        "pic1",    /* The key for the uploaded object */
-//                        pic1);     /* The file where the data to upload exists */
-//                observer.refresh();
-//                s3.putObject("hhproperties",     /* The bucket to upload to */
-//                        "pic1",    /* The key for the uploaded object */
-//                        pic1);
-//                putItemRequest=new PutItemRequest();
-//                putItemRequest.setTableName("Music");
-//
-//                attributeValue=new AttributeValue();
-//                attributeValue.setS("GD");
-//                mapRequest.put("Artist", attributeValue);
-//                putItemRequest.setItem(mapRequest);
+
+                //S3: upload pic to "hhproperties" S3 Bucket
+
+
+                s3 = new AmazonS3Client(credentialsProvider);
+
+                // Set the region of your S3 bucket
+                s3.setRegion(Region.getRegion(Regions.US_EAST_1));
+                transferUtility = new TransferUtility(s3, getApplicationContext());
+
+                TransferObserver observer = transferUtility.upload(
+                        "hhproperties/prop1",     /* The bucket to upload to */
+                        "klm",    /* The key for the uploaded object */
+                        pic1);     /* The file where the data to upload exists */
+                observer.refresh();
+
+
             }catch (Exception e){
                 Log.v("_dan datatask",e.getMessage());
             }
