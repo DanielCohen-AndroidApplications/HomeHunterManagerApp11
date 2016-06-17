@@ -305,7 +305,7 @@ public class CreateActivity extends Activity {
         arrayList.add(uri3.toString());
         arrayList.add(uri4.toString());
         bundle.putStringArrayList("arrayList",arrayList);
-
+        //TODO:Handle situations where fields are left blank/less than 3 photos are added
         Intent i = new Intent (CreateActivity.this, ConfirmActivity.class);
         i.putExtra("bundle",bundle);
 //        try {

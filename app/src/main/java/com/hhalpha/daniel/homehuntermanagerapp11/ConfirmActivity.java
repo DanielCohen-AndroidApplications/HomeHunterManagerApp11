@@ -1,8 +1,11 @@
 package com.hhalpha.daniel.homehuntermanagerapp11;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Address;
+import android.location.Geocoder;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -17,6 +20,7 @@ import com.amazonaws.AmazonServiceException;
 import com.amazonaws.AmazonWebServiceRequest;
 import com.amazonaws.ResponseMetadata;
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
+import com.amazonaws.http.HttpClient;
 import com.amazonaws.mobileconnectors.cognito.CognitoSyncManager;
 import com.amazonaws.mobileconnectors.cognito.Dataset;
 import com.amazonaws.mobileconnectors.cognito.DefaultSyncCallback;
@@ -71,15 +75,27 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.vision.barcode.Barcode;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import javax.net.ssl.HttpsURLConnection;
 
 /**
  * Created by Daniel on 5/30/2016.
@@ -101,6 +117,7 @@ public class ConfirmActivity extends Activity implements OnMapReadyCallback {
     Property property;
     ImageView imageView5, imageView6, imageView7, imageView8;
     File pic1, pic2, pic3, pic4;
+    Double lat, lng;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -311,10 +328,8 @@ public class ConfirmActivity extends Activity implements OnMapReadyCallback {
                 return null;
             }
         };
-        MapFragment mapFragment = (MapFragment) getFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
         bundle=getIntent().getBundleExtra("bundle");
+        //TODO:Handle situations where fields are left blank/less than 3 photos are added
         textViewAddress=(TextView) findViewById(R.id.textViewAddress);
         textViewRent=(TextView) findViewById(R.id.textViewRent);
         textViewSqft=(TextView) findViewById(R.id.textViewSqft);
@@ -336,12 +351,7 @@ public class ConfirmActivity extends Activity implements OnMapReadyCallback {
         imageView6=(ImageView) findViewById(R.id.imageView6);
         imageView7=(ImageView) findViewById(R.id.imageView7);
         imageView8=(ImageView) findViewById(R.id.imageView8);
-//        try {
-//            FileInputStream fis = new FileInputStream(new File(getCacheDir(), arrayList.get(-1)));
-//
-//        }catch (Exception e){
-//            Log.v("_dan", e.getMessage());
-//        }
+
         credentialsProvider = new CognitoCachingCredentialsProvider(
                 getApplicationContext(),
                 "us-east-1:ceae0626-1082-4759-85c3-fae01752889a", // Identity Pool ID
@@ -372,10 +382,13 @@ public class ConfirmActivity extends Activity implements OnMapReadyCallback {
 //            Log.v("_dan", bundle.getStringArrayList("arrayList").get(1));
             arrayList = bundle.getStringArrayList("arrayList");
             for(int i=0;i<arrayList.size();i++){
-                Log.v("_dan",arrayList.get(i));
+                Log.v("_dan arraylist",arrayList.get(i));
             }
             textViewAddress.setText("Address: "+arrayList.get(0));
             address=arrayList.get(0);
+
+            new latLngFromAddressTask().execute(address);
+
             textViewSqft.setText(arrayList.get(1)+" Sqft");
             textViewRent.setText("Rent:"+arrayList.get(2));
             textViewMinSalary.setText("Minimum Salary:"+arrayList.get(3));
@@ -457,70 +470,70 @@ public class ConfirmActivity extends Activity implements OnMapReadyCallback {
             imageView6.setImageBitmap(selectedImage2);
             imageView7.setImageBitmap(selectedImage3);
             imageView8.setImageBitmap(selectedImage4);
-            try{
-                pic1 = new File(Environment.getExternalStoragePublicDirectory(
-                        Environment.DIRECTORY_PICTURES), uri1.toString());
-                pic1.createNewFile();
-                pic2 = new File(Environment.getExternalStoragePublicDirectory(
-                        Environment.DIRECTORY_PICTURES), uri2.toString());
-                pic2.createNewFile();
-                pic3 = new File(Environment.getExternalStoragePublicDirectory(
-                        Environment.DIRECTORY_PICTURES), uri3.toString());
-                pic3.createNewFile();
-                pic4 = new File(Environment.getExternalStoragePublicDirectory(
-                        Environment.DIRECTORY_PICTURES), uri4.toString());
-                pic4.createNewFile();
-            }catch(Exception e){
-                Log.v("_dan create img", e.getMessage());
-            }
-            FileOutputStream fos = new FileOutputStream(pic1);
-            FileOutputStream fos2 = new FileOutputStream(pic2);
-            FileOutputStream fos3 = new FileOutputStream(pic3);
-            FileOutputStream fos4 = new FileOutputStream(pic4);
-            try {
-                fos.write(bitmapdata);
-                fos.flush();
-                fos.close();
-                fos2.write(bitmapdata2);
-                fos2.flush();
-                fos2.close();
-                fos3.write(bitmapdata3);
-                fos3.flush();
-                fos3.close();
-                fos4.write(bitmapdata4);
-                fos4.flush();
-                fos4.close();
-            }catch(Exception e){
-                Log.v("_dan", e.getMessage());
-            }
+//            try{
+//                pic1 = new File(Environment.getExternalStoragePublicDirectory(
+//                        Environment.DIRECTORY_PICTURES), uri1.toString());
+//                pic1.createNewFile();
+//                pic2 = new File(Environment.getExternalStoragePublicDirectory(
+//                        Environment.DIRECTORY_PICTURES), uri2.toString());
+//                pic2.createNewFile();
+//                pic3 = new File(Environment.getExternalStoragePublicDirectory(
+//                        Environment.DIRECTORY_PICTURES), uri3.toString());
+//                pic3.createNewFile();
+//                pic4 = new File(Environment.getExternalStoragePublicDirectory(
+//                        Environment.DIRECTORY_PICTURES), uri4.toString());
+//                pic4.createNewFile();
+//            }catch(Exception e){
+//                Log.v("_dan create img", e.getMessage());
+//            }
+//            FileOutputStream fos = new FileOutputStream(pic1);
+//            FileOutputStream fos2 = new FileOutputStream(pic2);
+//            FileOutputStream fos3 = new FileOutputStream(pic3);
+//            FileOutputStream fos4 = new FileOutputStream(pic4);
+//            try {
+//                fos.write(bitmapdata);
+//                fos.flush();
+//                fos.close();
+//                fos2.write(bitmapdata2);
+//                fos2.flush();
+//                fos2.close();
+//                fos3.write(bitmapdata3);
+//                fos3.flush();
+//                fos3.close();
+//                fos4.write(bitmapdata4);
+//                fos4.flush();
+//                fos4.close();
+//            }catch(Exception e){
+//                Log.v("_dan fos", e.getMessage());
+//            }
 
         }catch (Exception e ){
-            Log.v("_dan", e.getMessage());
+            Log.v("_dan outsidetry", e.getMessage());
         }
+
 
 
     }
     @Override
     public void onMapReady(GoogleMap map) {
-
-        LatLng sydney = new LatLng(-33.867, 151.206);
+        LatLng location=new LatLng(lat,lng);
         try {
             map.setMyLocationEnabled(true);
         }catch (SecurityException e){
-            Log.v("_dan", e.getMessage());
+            Log.v("_dan mapsec", e.getMessage());
         }
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, 13));
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 13));
 
         map.addMarker(new MarkerOptions()
-                .title("Sydney")
-                .snippet("The most populous city in Australia.")
-                .position(sydney));
+                .title(arrayList.get(0))
+                .snippet(arrayList.get(1))
+                .position(location));
     }
     public void confirm(View v){
         try {
             new dataTask().execute();
         }catch (Exception e){
-            Log.v("_dan",e.getMessage());
+            Log.v("_dan confirm",e.getMessage());
         }
     }
     public class dataTask extends AsyncTask<String, Integer, String> {
@@ -533,6 +546,7 @@ public class ConfirmActivity extends Activity implements OnMapReadyCallback {
                 property.setAddress(address);
                 property.setDataString(arrayList.toString());
                 mapper.save(property);
+                //TODO put pics in S3
 //                mapper.notify();
 //                C:\Users\Daniel\Desktop\DanTest1-aws-my-sample-app-android\DanAwsTest\app\src\main\res\raw\pic1.PNG
 //                //S3: upload pic to "hhproperties" S3 Bucket
@@ -555,11 +569,99 @@ public class ConfirmActivity extends Activity implements OnMapReadyCallback {
 //                mapRequest.put("Artist", attributeValue);
 //                putItemRequest.setItem(mapRequest);
             }catch (Exception e){
-
+                Log.v("_dan datatask",e.getMessage());
             }
 
 
             return "Executed";
         }
     }
+
+    private class latLngFromAddressTask extends AsyncTask<String, Void, String[]> {
+        ProgressDialog dialog = new ProgressDialog(ConfirmActivity.this);
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            dialog.setMessage("Please wait...");
+            dialog.setCanceledOnTouchOutside(false);
+            dialog.show();
+        }
+
+        @Override
+        protected String[] doInBackground(String... params) {
+            String response;
+            try {
+                response = getLatLongByURL("http://maps.google.com/maps/api/geocode/json?address="+params[0].replace(",","").replace(" ","+")+"&sensor=false");
+                Log.d("response",""+response);
+                return new String[]{response};
+            } catch (Exception e) {
+                Log.v("_dan gmbackground",e.getMessage());
+                return new String[]{"error"};
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String... result) {
+            try {
+                JSONObject jsonObject = new JSONObject(result[0]);
+
+                lng = ((JSONArray)jsonObject.get("results")).getJSONObject(0)
+                        .getJSONObject("geometry").getJSONObject("location")
+                        .getDouble("lng");
+
+                lat = ((JSONArray)jsonObject.get("results")).getJSONObject(0)
+                        .getJSONObject("geometry").getJSONObject("location")
+                        .getDouble("lat");
+
+                Log.d("latitude", "" + lat);
+                Log.d("longitude", "" + lng);
+            } catch (JSONException e) {
+                Log.v("_dan gmjson", e.getMessage());
+            }
+            if (dialog.isShowing()) {
+                dialog.dismiss();
+            }
+            setupMap();
+        }
+    }
+
+    public void setupMap(){
+        MapFragment mapFragment = (MapFragment) getFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+    }
+    public String getLatLongByURL(String requestURL) {
+        URL url;
+        String response = "";
+        try {
+            url = new URL(requestURL);
+
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setReadTimeout(15000);
+            conn.setConnectTimeout(15000);
+            conn.setRequestMethod("GET");
+            conn.setDoInput(true);
+            conn.setRequestProperty("Content-Type",
+                    "application/x-www-form-urlencoded");
+            conn.setDoOutput(true);
+            int responseCode = conn.getResponseCode();
+
+            if (responseCode == HttpsURLConnection.HTTP_OK) {
+                String line;
+                BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                while ((line = br.readLine()) != null) {
+                    response += line;
+                }
+            } else {
+                response = "";
+            }
+
+        } catch (Exception e) {
+            Log.v("_danlatlngbyurl",e.getMessage());
+            e.printStackTrace();
+        }
+        return response;
+    }
+
+
 }
