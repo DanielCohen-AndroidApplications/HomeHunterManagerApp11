@@ -473,7 +473,7 @@ public class ConfirmActivity extends Activity implements OnMapReadyCallback {
             imageView7.setImageBitmap(selectedImage3);
             imageView8.setImageBitmap(selectedImage4);
 
-            pic1 = new File(getApplicationContext().getCacheDir(), "pic117jun2016_1");
+            pic1 = new File(getApplicationContext().getCacheDir(), address+"pic1");
             pic1.createNewFile();
             FileOutputStream fos = new FileOutputStream(pic1);
             try {
@@ -483,54 +483,45 @@ public class ConfirmActivity extends Activity implements OnMapReadyCallback {
             }catch(Exception e){
                 e.printStackTrace();
             }
-            //TODO get image files from External Storage
-//            try{
-//                pic1 = new File(Environment.getExternalStoragePublicDirectory(
-//                        Environment.DIRECTORY_PICTURES), selectedImage.toString());
-//                pic1.createNewFile();
-//
-//                pic2 = new File(Environment.getExternalStoragePublicDirectory(
-//                        Environment.DIRECTORY_PICTURES), selectedImage2.toString());
-//                pic2.createNewFile();
-//
-//                pic3 = new File(Environment.getExternalStoragePublicDirectory(
-//                        Environment.DIRECTORY_PICTURES), selectedImage3.toString());
-//                pic3.createNewFile();
-//
-//                pic1 = new File(Environment.getExternalStoragePublicDirectory(
-//                        Environment.DIRECTORY_PICTURES), selectedImage4.toString());
-//                pic4.createNewFile();
-//            }catch(Exception e){
-//                Log.v("_dan create img confirm", e.getMessage());
-//            }
-//            FileOutputStream fos = new FileOutputStream(pic1);
-//            FileOutputStream fos2 = new FileOutputStream(pic2);
-//            FileOutputStream fos3 = new FileOutputStream(pic3);
-//            FileOutputStream fos4 = new FileOutputStream(pic4);
-//            try {
-//                fos.write(bitmapdata);
-//                fos.flush();
-//                fos.close();
-//                fos2.write(bitmapdata2);
-//                fos2.flush();
-//                fos2.close();
-//                fos3.write(bitmapdata3);
-//                fos3.flush();
-//                fos3.close();
-//                fos4.write(bitmapdata4);
-//                fos4.flush();
-//                fos4.close();
-//            }catch(Exception e){
-//                Log.v("_dan fos confirm", e.getMessage());
-//            }
+
+            pic2 = new File(getApplicationContext().getCacheDir(), address+"pic2");
+            pic2.createNewFile();
+            FileOutputStream fos2 = new FileOutputStream(pic2);
+            try {
+                fos2.write(bitmapdata2);
+                fos2.flush();
+                fos2.close();
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+
+            pic3 = new File(getApplicationContext().getCacheDir(), address+"pic3");
+            pic3.createNewFile();
+            FileOutputStream fos3 = new FileOutputStream(pic3);
+            try {
+                fos3.write(bitmapdata3);
+                fos3.flush();
+                fos3.close();
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+
+            pic4 = new File(getApplicationContext().getCacheDir(), address+"pic4");
+            pic4.createNewFile();
+            FileOutputStream fos4 = new FileOutputStream(pic4);
+            try {
+                fos4.write(bitmapdata4);
+                fos4.flush();
+                fos4.close();
+            }catch(Exception e){
+                e.printStackTrace();
+            }
 
         }catch (Exception e ){
             Log.v("_dan outsidetry", e.getMessage());
         }
-
-
-
     }
+
     @Override
     public void onMapReady(GoogleMap map) {
         LatLng location=new LatLng(lat,lng);
@@ -548,7 +539,6 @@ public class ConfirmActivity extends Activity implements OnMapReadyCallback {
     }
     public void confirm(View v){
         try {
-
             new dataTask().execute();
         }catch (Exception e){
             Log.v("_dan confirm",e.getMessage());
@@ -564,9 +554,6 @@ public class ConfirmActivity extends Activity implements OnMapReadyCallback {
                 property.setAddress(address);
                 property.setDataString(arrayList.toString());
                 mapper.save(property);
-                //TODO put pics in S3
-
-                //S3: upload pic to "hhproperties" S3 Bucket
 
 
                 s3 = new AmazonS3Client(credentialsProvider);
@@ -576,10 +563,25 @@ public class ConfirmActivity extends Activity implements OnMapReadyCallback {
                 transferUtility = new TransferUtility(s3, getApplicationContext());
 
                 TransferObserver observer = transferUtility.upload(
-                        "hhproperties/prop1",     /* The bucket to upload to */
-                        "klm",    /* The key for the uploaded object */
+                        "hhproperties/"+address,     /* The bucket to upload to */
+                        "pic1",    /* The key for the uploaded object */
                         pic1);     /* The file where the data to upload exists */
+                TransferObserver observer2 = transferUtility.upload(
+                        "hhproperties/"+address,
+                        "pic2",
+                        pic2);
+                TransferObserver observer3 = transferUtility.upload(
+                        "hhproperties/"+address,
+                        "pic3",
+                        pic3);
+                TransferObserver observer4 = transferUtility.upload(
+                        "hhproperties/"+address,     /* The bucket to upload to */
+                        "pic4",
+                        pic4);
                 observer.refresh();
+                observer2.refresh();
+                observer3.refresh();
+                observer4.refresh();
 
 
             }catch (Exception e){
