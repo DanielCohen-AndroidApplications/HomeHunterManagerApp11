@@ -69,6 +69,7 @@ import com.amazonaws.services.dynamodbv2.model.UpdateTableResult;
 import com.amazonaws.services.dynamodbv2.model.WriteRequest;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -92,6 +93,7 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -120,6 +122,8 @@ public class ConfirmActivity extends Activity implements OnMapReadyCallback {
     Double lat, lng;
     Uri uri1, uri2, uri3, uri4;
     Bitmap selectedImage, selectedImage2,selectedImage3,selectedImage4;
+    Map<String, String> userMetadata;
+    ObjectMetadata myObjectMetadata;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -376,14 +380,25 @@ public class ConfirmActivity extends Activity implements OnMapReadyCallback {
 
 
         try {
-//            Log.v("_dan", bundle.getStringArrayList("arrayList").get(0));
-//            Log.v("_dan", bundle.getStringArrayList("arrayList").get(1));
+
+
+
+
+
             arrayList = bundle.getStringArrayList("arrayList");
             for(int i=0;i<arrayList.size();i++){
                 Log.v("_dan arraylist",arrayList.get(i));
             }
             textViewAddress.setText("Address: "+arrayList.get(0));
             address=arrayList.get(0);
+
+            //create a map to store user metadata
+            myObjectMetadata = new ObjectMetadata();
+            userMetadata = new HashMap<String,String>();
+            userMetadata.put("info",arrayList.toString());
+
+            //call setUserMetadata on our ObjectMetadata object, passing it our map
+            myObjectMetadata.setUserMetadata(userMetadata);
 
             new latLngFromAddressTask().execute(address);
 
@@ -565,7 +580,8 @@ public class ConfirmActivity extends Activity implements OnMapReadyCallback {
                 TransferObserver observer = transferUtility.upload(
                         "hhproperties/"+address,     /* The bucket to upload to */
                         "pic1",    /* The key for the uploaded object */
-                        pic1);     /* The file where the data to upload exists */
+                        pic1, /* The file where the data to upload exists */
+                        myObjectMetadata);     /*metadata holds all non-picture info for apt as a string, only included in first pic*/
                 TransferObserver observer2 = transferUtility.upload(
                         "hhproperties/"+address,
                         "pic2",
