@@ -567,7 +567,7 @@ public class ConfirmActivity extends Activity implements OnMapReadyCallback {
             try {
                 //DYNAMO: insert attribute into "Music" Table.
                 property.setAddress(address);
-                property.setDataString(arrayList.toString());
+                property.setDataString(arrayList.subList(1,16).toString());
                 mapper.save(property);
 
 
