@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
@@ -56,14 +57,20 @@ public class MainActivity extends Activity {
     Bitmap bitmapTest;
     FileOutputStream fos;
     String keyTest;
+
+    CustomListViewAdapter adapter;
+    ArrayList<PropertyListEntry> propertyListEntries;
+    ListView listView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         try {
             Log.v("_danoncreate",getApplicationContext().getCacheDir().listFiles().toString());
-
-
+            propertyListEntries = new ArrayList<PropertyListEntry>();
+            adapter = new CustomListViewAdapter(getApplicationContext(), R.layout.list_layout1, propertyListEntries);
+            listView = (ListView) findViewById(R.id.listView);
+            listView.setAdapter(adapter);
             addresses=new ArrayList<String>();
 
             listBtn = (Button) findViewById(R.id.listBtn);
@@ -109,31 +116,47 @@ public class MainActivity extends Activity {
         protected ArrayList<String> doInBackground(String... params) {
 
             try {
+
                 s3 = new AmazonS3Client(credentialsProvider);
 
                 // Set the region of your S3 bucket
                 s3.setRegion(Region.getRegion(Regions.US_EAST_1));
                 transferUtility = new TransferUtility(s3, getApplicationContext());
                 for (S3ObjectSummary summary : S3Objects.inBucket(s3, "hhproperties")) {
-                    addresses.add(summary.getKey());
-                    Log.v("_dan", summary.getKey());
-                    keyTest=summary.getKey();
+                    try {
+                        addresses.add(summary.getKey());
+                        Log.v("_dan", summary.getKey());
+                        String key = summary.getKey();
+                        S3ObjectInputStream content = s3.getObject("hhproperties", key).getObjectContent();
+                        byte[] bytes = IOUtils.toByteArray(content);
+                        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+
+                        PropertyListEntry propertyListEntry = new PropertyListEntry(key, bitmap);
+                        propertyListEntry.setPic(bitmap);
+                        propertyListEntry.setPropertyText(key);
+                        propertyListEntries.add(propertyListEntry);
+
+                        Log.v("_dan", addresses.toString());
+                    }catch(Exception e){
+                        e.printStackTrace();
+                    }
                 }
-                S3ObjectInputStream content = s3.getObject("hhproperties", keyTest).getObjectContent();
-                byte[] bytes = IOUtils.toByteArray(content);
-                bitmapTest = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                Log.v("_dan", addresses.toString());
+
 
             } catch (Exception e) {
-                Log.v("_dandoib", e.getMessage());
+                e.printStackTrace();
             }
             return addresses;
         }
 
         @Override
         protected void onPostExecute(ArrayList<String> strings) {
-            textViewTest.setText(strings.toString());
-            imageViewTest.setImageBitmap(bitmapTest);
+            try {
+                textViewTest.setText(strings.toString());
+                adapter.notifyDataSetChanged();
+            }catch(Exception e){
+                Log.v("_dan post ex",e.getMessage());
+            }
         }
     }
 }
