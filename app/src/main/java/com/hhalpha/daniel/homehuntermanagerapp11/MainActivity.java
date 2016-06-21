@@ -25,9 +25,11 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.S3ResponseMetadata;
 import com.amazonaws.services.s3.iterable.S3Objects;
 import com.amazonaws.services.s3.model.ListObjectsRequest;
 import com.amazonaws.services.s3.model.ObjectListing;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.amazonaws.util.IOUtils;
@@ -61,6 +63,7 @@ public class MainActivity extends Activity {
     CustomListViewAdapter adapter;
     ArrayList<PropertyListEntry> propertyListEntries;
     ListView listView;
+    ArrayList<String> metadataArrayList;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,6 +71,7 @@ public class MainActivity extends Activity {
         try {
             Log.v("_danoncreate",getApplicationContext().getCacheDir().listFiles().toString());
             propertyListEntries = new ArrayList<PropertyListEntry>();
+            metadataArrayList=new ArrayList<String>();
             adapter = new CustomListViewAdapter(getApplicationContext(), R.layout.list_layout1, propertyListEntries);
             listView = (ListView) findViewById(R.id.listView);
             listView.setAdapter(adapter);
@@ -124,18 +128,22 @@ public class MainActivity extends Activity {
                 transferUtility = new TransferUtility(s3, getApplicationContext());
                 for (S3ObjectSummary summary : S3Objects.inBucket(s3, "hhproperties")) {
                     try {
-                        addresses.add(summary.getKey());
                         Log.v("_dan", summary.getKey());
                         String key = summary.getKey();
                         S3ObjectInputStream content = s3.getObject("hhproperties", key).getObjectContent();
+                        ObjectMetadata metadata = s3.getObject("hhproperties", key).getObjectMetadata();
+                        Log.v("_dan meta",metadata.getUserMetaDataOf("info").toString());
+                        metadataArrayList.add(metadata.getUserMetaDataOf("info").toString());
                         byte[] bytes = IOUtils.toByteArray(content);
                         Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
 
                         PropertyListEntry propertyListEntry = new PropertyListEntry(key, bitmap);
                         propertyListEntry.setPic(bitmap);
                         propertyListEntry.setPropertyText(key);
-                        propertyListEntries.add(propertyListEntry);
-
+                        if(!addresses.toString().contains(summary.getKey().split("/")[0])) {
+                            propertyListEntries.add(propertyListEntry);
+                            addresses.add(summary.getKey());
+                        }
                         Log.v("_dan", addresses.toString());
                     }catch(Exception e){
                         e.printStackTrace();
@@ -146,7 +154,7 @@ public class MainActivity extends Activity {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            return addresses;
+            return metadataArrayList;
         }
 
         @Override
