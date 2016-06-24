@@ -126,6 +126,9 @@ public class MainActivity extends Activity {
 
     public void createNewProperty(View v){
         Intent i= new Intent(MainActivity.this, CreateActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putBoolean("editing",false);
+        i.putExtra("bundle", bundle);
         startActivity(i);
     }
 

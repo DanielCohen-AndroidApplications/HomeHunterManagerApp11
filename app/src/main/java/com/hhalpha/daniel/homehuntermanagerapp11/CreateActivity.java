@@ -30,6 +30,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Created by Daniel on 5/30/2016.
@@ -53,10 +54,14 @@ public class CreateActivity extends Activity {
     File pic1, pic2, pic3, pic4;
     String path1, path2, path3, path4;
     Uri uri1, uri2, uri3, uri4;
+    ArrayList<String> editArrayList;
+    Bundle bundle;
+    Boolean editing;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create);
+
         imageView = (ImageView) findViewById(R.id.imageView);
         imageView2 = (ImageView) findViewById(R.id.imageView2);
         imageView3 = (ImageView) findViewById(R.id.imageView3);
@@ -97,6 +102,25 @@ public class CreateActivity extends Activity {
         checkBoxGuarantor = (CheckBox) findViewById(R.id.checkBoxGuarantor);
         checkBoxDeposit = (CheckBox) findViewById(R.id.checkBoxDeposit);
         checkBoxDoorman = (CheckBox) findViewById(R.id.checkBoxDoorman);
+        try{
+            bundle = getIntent().getBundleExtra("bundle");
+            editing = bundle.getBoolean("editing");
+            if(editing){
+                Log.v("_dan edit arrayList",bundle.getStringArrayList("arrayList").toString() );
+                editArrayList=new ArrayList<String>(Arrays.asList(bundle.getStringArrayList("arrayList").toString().split(",")));
+                Log.v("_dan editarrayList",editArrayList.toString());
+                editTextLocation.setText(editArrayList.get(0).replace("[","").replace("+",","));
+                editTextSqft.setText(editArrayList.get(2));
+                editTextRent.setText(editArrayList.get(3));
+                editTextMinSalary.setText(editArrayList.get(4));
+                editTextShort.setText(editArrayList.get(5));
+                editTextLong.setText(editArrayList.get(6));
+                editTextBed.setText(editArrayList.get(7));
+                editTextBath.setText(editArrayList.get(8));
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public void selectPics(View v){

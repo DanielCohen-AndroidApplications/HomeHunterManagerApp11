@@ -2,6 +2,7 @@ package com.hhalpha.daniel.homehuntermanagerapp11;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Address;
@@ -773,5 +774,11 @@ public class ConfirmActivity extends Activity implements OnMapReadyCallback {
 
 
     }
-
+    public void edit (View v){
+        Intent i = new Intent(ConfirmActivity.this,CreateActivity.class);
+        bundle.putBoolean("editing",true);
+        bundle.putStringArrayList("arrayList",arrayList);
+        i.putExtra("bundle",bundle);
+        startActivity(i);
+    }
 }
