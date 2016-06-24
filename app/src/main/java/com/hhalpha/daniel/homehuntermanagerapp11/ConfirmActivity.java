@@ -736,20 +736,27 @@ public class ConfirmActivity extends Activity implements OnMapReadyCallback {
                 // Set the region of your S3 bucket
                 s3.setRegion(Region.getRegion(Regions.US_EAST_1));
                 transferUtility = new TransferUtility(s3, getApplicationContext());
-                for (S3ObjectSummary summary : S3Objects.inBucket(s3, "hhproperties")) {
-                    try {
 
-                        S3ObjectInputStream content = s3.getObject("hhproperties/"+address, "pic1").getObjectContent();
-                        byte[] bytes = IOUtils.toByteArray(content);
-                        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                        bitmaps.add(bitmap);
-                        return bitmaps;
-                    }catch(Exception e){
-                        e.printStackTrace();
-                    }
-                }
+                S3ObjectInputStream content = s3.getObject("hhproperties/"+address, "pic1").getObjectContent();
+                byte[] bytes = IOUtils.toByteArray(content);
+                Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                bitmaps.add(bitmap);
 
+                S3ObjectInputStream content2 = s3.getObject("hhproperties/"+address, "pic2").getObjectContent();
+                byte[] bytes2 = IOUtils.toByteArray(content2);
+                Bitmap bitmap2 = BitmapFactory.decodeByteArray(bytes2, 0, bytes2.length);
+                bitmaps.add(bitmap2);
 
+                S3ObjectInputStream content3 = s3.getObject("hhproperties/"+address, "pic3").getObjectContent();
+                byte[] bytes3 = IOUtils.toByteArray(content3);
+                Bitmap bitmap3 = BitmapFactory.decodeByteArray(bytes3, 0, bytes3.length);
+                bitmaps.add(bitmap3);
+
+                S3ObjectInputStream content4 = s3.getObject("hhproperties/"+address, "pic4").getObjectContent();
+                byte[] bytes4 = IOUtils.toByteArray(content4);
+                Bitmap bitmap4 = BitmapFactory.decodeByteArray(bytes4, 0, bytes4.length);
+                bitmaps.add(bitmap4);
+                return bitmaps;
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -759,6 +766,9 @@ public class ConfirmActivity extends Activity implements OnMapReadyCallback {
         @Override
         protected void onPostExecute(ArrayList<Bitmap> bitmaps) {
             imageView5.setImageBitmap(bitmaps.get(0));
+            imageView6.setImageBitmap(bitmaps.get(1));
+            imageView7.setImageBitmap(bitmaps.get(2));
+            imageView8.setImageBitmap(bitmaps.get(3));
         }
 
 
