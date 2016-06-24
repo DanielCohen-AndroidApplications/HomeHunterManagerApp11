@@ -407,7 +407,7 @@ public class ConfirmActivity extends Activity implements OnMapReadyCallback {
             }
             textViewAddress.setText("Address: "+arrayList.get(0).replace("[","").replace("+",","));
             address=arrayList.get(0);
-            for(int i=1;i<arrayList.size();i++){
+            for(int i=0;i<arrayList.size();i++){
                 abridgedList.add(arrayList.get(i).replace(",","+"));
             }
             //create a map to store user metadata
@@ -422,56 +422,56 @@ public class ConfirmActivity extends Activity implements OnMapReadyCallback {
 
 
 
-            textViewSqft.setText(arrayList.get(1)+" Sqft");
-            textViewRent.setText("Rent:"+arrayList.get(2));
-            textViewMinSalary.setText("Minimum Salary:"+arrayList.get(3));
-            textViewShort.setText(arrayList.get(4));
-            textViewLong.setText(arrayList.get(5));
-            textViewBeds.setText(arrayList.get(6)+ " Beds");
-            textViewBaths.setText(arrayList.get(7)+" Baths");
-            if(arrayList.get(8).equals("true")) {
+            textViewSqft.setText(arrayList.get(2)+" Sqft");
+            textViewRent.setText("Rent:"+arrayList.get(3));
+            textViewMinSalary.setText("Minimum Salary:"+arrayList.get(4));
+            textViewShort.setText(arrayList.get(5));
+            textViewLong.setText(arrayList.get(6));
+            textViewBeds.setText(arrayList.get(7)+ " Beds");
+            textViewBaths.setText(arrayList.get(8)+" Baths");
+            if(arrayList.get(9).equals("true")) {
                 textViewCouples.setText("Couples OK");
-            } else if(arrayList.get(8).equals("false")) {
+            } else {
                 textViewCouples.setText("No Couples");
             }
-            if(arrayList.get(9).equals("true")) {
+            if(arrayList.get(10).equals("true")) {
                 textViewChildren.setText("Children OK");
-            } else if(arrayList.get(9).equals("false")) {
+            } else {
                 textViewChildren.setText("No Children");
             }
-            if(arrayList.get(10).equals("true")) {
+            if(arrayList.get(11).equals("true")) {
                 textViewSmallDogs.setText("Small Dogs OK");
-            } else if(arrayList.get(10).equals("false")) {
+            } else if(arrayList.get(11).equals("false")) {
                 textViewCouples.setText("No Small Dogs");
             }
-            if(arrayList.get(11).equals("true")) {
+            if(arrayList.get(12).equals("true")) {
                 textViewDogs.setText("Large Dogs OK");
-            } else if(arrayList.get(11).equals("false")) {
+            } else {
                 textViewDogs.setText("No Large Dogs");
             }
-            if(arrayList.get(12).equals("true")) {
+            if(arrayList.get(13).equals("true")) {
                 textViewCats.setText("Cats OK");
-            } else if(arrayList.get(12).equals("false")) {
+            } else {
                 textViewCats.setText("No Cats");
             }
-            if(arrayList.get(13).equals("true")) {
+            if(arrayList.get(14).equals("true")) {
                 textViewSmoking.setText("Smoking OK");
-            } else if(arrayList.get(13).equals("false")) {
+            } else {
                 textViewSmoking.setText("No Smoking");
             }
-            if(arrayList.get(14).equals("true")) {
+            if(arrayList.get(15).equals("true")) {
                 textViewGuarantor.setText("Guarantor OK");
-            } else if(arrayList.get(14).equals("false")) {
+            } else {
                 textViewGuarantor.setText("No Guarantors");
             }
-            if(arrayList.get(15).equals("true")) {
+            if(arrayList.get(16).equals("true")) {
                 textViewSecurity.setText("Security Deposit Required");
-            } else if(arrayList.get(15).equals("false")) {
+            } else {
                 textViewSecurity.setText("No Security Deposit");
             }
-            if(arrayList.get(16).equals("true")) {
+            if(arrayList.get(17).equals("true")) {
                 textViewDoorman.setText("Doorman");
-            } else if(arrayList.get(16).equals("false")) {
+            } else {
                 textViewDoorman.setText("No Doorman");
             }
 
