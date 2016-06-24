@@ -124,6 +124,7 @@ public class ConfirmActivity extends Activity implements OnMapReadyCallback {
     Bitmap selectedImage, selectedImage2,selectedImage3,selectedImage4;
     Map<String, String> userMetadata;
     ObjectMetadata myObjectMetadata;
+    ArrayList<String> abridgedList;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -334,6 +335,7 @@ public class ConfirmActivity extends Activity implements OnMapReadyCallback {
                 return null;
             }
         };
+        abridgedList = new ArrayList<String>();
         bundle=getIntent().getBundleExtra("bundle");
         //TODO:Handle situations where fields are left blank/less than 3 photos are added
         textViewAddress=(TextView) findViewById(R.id.textViewAddress);
@@ -391,11 +393,13 @@ public class ConfirmActivity extends Activity implements OnMapReadyCallback {
             }
             textViewAddress.setText("Address: "+arrayList.get(0));
             address=arrayList.get(0);
-
+            for(int i=1;i<17;i++){
+                abridgedList.add(arrayList.get(i).replace(",","+").replace(" ",""));
+            }
             //create a map to store user metadata
             myObjectMetadata = new ObjectMetadata();
             userMetadata = new HashMap<String,String>();
-            userMetadata.put("info",arrayList.toString());
+            userMetadata.put("info",abridgedList.toString());
 
             //call setUserMetadata on our ObjectMetadata object, passing it our map
             myObjectMetadata.setUserMetadata(userMetadata);
@@ -567,7 +571,9 @@ public class ConfirmActivity extends Activity implements OnMapReadyCallback {
             try {
                 //DYNAMO: insert attribute into "Music" Table.
                 property.setAddress(address);
-                property.setDataString(arrayList.subList(1,16).toString());
+
+
+                property.setDataString(arrayList.subList(1,16).toString().replace(",",""));
                 mapper.save(property);
 
 
