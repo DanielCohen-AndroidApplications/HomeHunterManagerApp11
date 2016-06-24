@@ -69,7 +69,12 @@ import com.amazonaws.services.dynamodbv2.model.UpdateTableResult;
 import com.amazonaws.services.dynamodbv2.model.WriteRequest;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.iterable.S3Objects;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.S3ObjectInputStream;
+import com.amazonaws.services.s3.model.S3ObjectSummary;
+import com.amazonaws.util.IOUtils;
+import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -340,6 +345,8 @@ public class ConfirmActivity extends Activity implements OnMapReadyCallback {
         abridgedList = new ArrayList<String>();
         strings= new ArrayList<String>();
         bundle=getIntent().getBundleExtra("bundle");
+        firstTime=bundle.getBoolean("firstTime");
+
         //TODO:Handle situations where fields are left blank/less than 3 photos are added
         textViewAddress=(TextView) findViewById(R.id.textViewAddress);
         textViewRent=(TextView) findViewById(R.id.textViewRent);
@@ -406,7 +413,8 @@ public class ConfirmActivity extends Activity implements OnMapReadyCallback {
                 Log.v("_dan arraylist",arrayList.get(i));
             }
             textViewAddress.setText("Address: "+arrayList.get(0).replace("[","").replace("+",","));
-            address=arrayList.get(0);
+            address=arrayList.get(0)
+                    .replace("[","").replace("+",",");
             for(int i=0;i<arrayList.size();i++){
                 abridgedList.add(arrayList.get(i).replace(",","+"));
             }
@@ -474,82 +482,84 @@ public class ConfirmActivity extends Activity implements OnMapReadyCallback {
             } else {
                 textViewDoorman.setText("No Doorman");
             }
+            if(firstTime) {
+                uri1 = Uri.parse(arrayList.get(18));
+                uri2 = Uri.parse(arrayList.get(19));
+                uri3 = Uri.parse(arrayList.get(20));
+                uri4 = Uri.parse(arrayList.get(21));
+                InputStream imageStream = getContentResolver().openInputStream(uri1);
+                InputStream imageStream2 = getContentResolver().openInputStream(uri2);
+                InputStream imageStream3 = getContentResolver().openInputStream(uri3);
+                InputStream imageStream4 = getContentResolver().openInputStream(uri4);
+                selectedImage = BitmapFactory.decodeStream(imageStream);
+                selectedImage2 = BitmapFactory.decodeStream(imageStream2);
+                selectedImage3 = BitmapFactory.decodeStream(imageStream3);
+                selectedImage4 = BitmapFactory.decodeStream(imageStream4);
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                ByteArrayOutputStream bos2 = new ByteArrayOutputStream();
+                ByteArrayOutputStream bos3 = new ByteArrayOutputStream();
+                ByteArrayOutputStream bos4 = new ByteArrayOutputStream();
+                selectedImage.compress(Bitmap.CompressFormat.PNG, 100 /*ignored for PNG*/, bos);
+                selectedImage2.compress(Bitmap.CompressFormat.PNG, 100, bos2);
+                selectedImage3.compress(Bitmap.CompressFormat.PNG, 100, bos3);
+                selectedImage4.compress(Bitmap.CompressFormat.PNG, 100, bos4);
 
-            uri1 = Uri.parse(arrayList.get(18));
-            uri2 = Uri.parse(arrayList.get(19));
-            uri3 = Uri.parse(arrayList.get(20));
-            uri4 = Uri.parse(arrayList.get(21));
-            InputStream imageStream = getContentResolver().openInputStream(uri1);
-            InputStream imageStream2 = getContentResolver().openInputStream(uri2);
-            InputStream imageStream3 = getContentResolver().openInputStream(uri3);
-            InputStream imageStream4 = getContentResolver().openInputStream(uri4);
-            selectedImage = BitmapFactory.decodeStream(imageStream);
-            selectedImage2 = BitmapFactory.decodeStream(imageStream2);
-            selectedImage3 = BitmapFactory.decodeStream(imageStream3);
-            selectedImage4 = BitmapFactory.decodeStream(imageStream4);
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            ByteArrayOutputStream bos2 = new ByteArrayOutputStream();
-            ByteArrayOutputStream bos3 = new ByteArrayOutputStream();
-            ByteArrayOutputStream bos4 = new ByteArrayOutputStream();
-            selectedImage.compress(Bitmap.CompressFormat.PNG, 100 /*ignored for PNG*/, bos);
-            selectedImage2.compress(Bitmap.CompressFormat.PNG, 100, bos2);
-            selectedImage3.compress(Bitmap.CompressFormat.PNG, 100, bos3);
-            selectedImage4.compress(Bitmap.CompressFormat.PNG, 100, bos4);
+                byte[] bitmapdata = bos.toByteArray();
+                byte[] bitmapdata2 = bos2.toByteArray();
+                byte[] bitmapdata3 = bos3.toByteArray();
+                byte[] bitmapdata4 = bos4.toByteArray();
 
-            byte[] bitmapdata = bos.toByteArray();
-            byte[] bitmapdata2 = bos2.toByteArray();
-            byte[] bitmapdata3 = bos3.toByteArray();
-            byte[] bitmapdata4 = bos4.toByteArray();
+                imageView5.setImageBitmap(selectedImage);
+                imageView6.setImageBitmap(selectedImage2);
+                imageView7.setImageBitmap(selectedImage3);
+                imageView8.setImageBitmap(selectedImage4);
 
-            imageView5.setImageBitmap(selectedImage);
-            imageView6.setImageBitmap(selectedImage2);
-            imageView7.setImageBitmap(selectedImage3);
-            imageView8.setImageBitmap(selectedImage4);
+                pic1 = new File(getApplicationContext().getCacheDir(), address + "pic1");
+                pic1.createNewFile();
+                FileOutputStream fos = new FileOutputStream(pic1);
+                try {
+                    fos.write(bitmapdata);
+                    fos.flush();
+                    fos.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
-            pic1 = new File(getApplicationContext().getCacheDir(), address+"pic1");
-            pic1.createNewFile();
-            FileOutputStream fos = new FileOutputStream(pic1);
-            try {
-                fos.write(bitmapdata);
-                fos.flush();
-                fos.close();
-            }catch(Exception e){
-                e.printStackTrace();
+                pic2 = new File(getApplicationContext().getCacheDir(), address + "pic2");
+                pic2.createNewFile();
+                FileOutputStream fos2 = new FileOutputStream(pic2);
+                try {
+                    fos2.write(bitmapdata2);
+                    fos2.flush();
+                    fos2.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                pic3 = new File(getApplicationContext().getCacheDir(), address + "pic3");
+                pic3.createNewFile();
+                FileOutputStream fos3 = new FileOutputStream(pic3);
+                try {
+                    fos3.write(bitmapdata3);
+                    fos3.flush();
+                    fos3.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                pic4 = new File(getApplicationContext().getCacheDir(), address + "pic4");
+                pic4.createNewFile();
+                FileOutputStream fos4 = new FileOutputStream(pic4);
+                try {
+                    fos4.write(bitmapdata4);
+                    fos4.flush();
+                    fos4.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }else{
+                new getImagesFromS3().execute(address);
             }
-
-            pic2 = new File(getApplicationContext().getCacheDir(), address+"pic2");
-            pic2.createNewFile();
-            FileOutputStream fos2 = new FileOutputStream(pic2);
-            try {
-                fos2.write(bitmapdata2);
-                fos2.flush();
-                fos2.close();
-            }catch(Exception e){
-                e.printStackTrace();
-            }
-
-            pic3 = new File(getApplicationContext().getCacheDir(), address+"pic3");
-            pic3.createNewFile();
-            FileOutputStream fos3 = new FileOutputStream(pic3);
-            try {
-                fos3.write(bitmapdata3);
-                fos3.flush();
-                fos3.close();
-            }catch(Exception e){
-                e.printStackTrace();
-            }
-
-            pic4 = new File(getApplicationContext().getCacheDir(), address+"pic4");
-            pic4.createNewFile();
-            FileOutputStream fos4 = new FileOutputStream(pic4);
-            try {
-                fos4.write(bitmapdata4);
-                fos4.flush();
-                fos4.close();
-            }catch(Exception e){
-                e.printStackTrace();
-            }
-
         }catch (Exception e ){
             e.printStackTrace();
         }
@@ -714,6 +724,44 @@ public class ConfirmActivity extends Activity implements OnMapReadyCallback {
         }
         return response;
     }
+    public class getImagesFromS3 extends AsyncTask<String, Integer, ArrayList<Bitmap>>{
 
+        @Override
+        protected ArrayList<Bitmap> doInBackground(String... params) {
+            ArrayList<Bitmap> bitmaps = new ArrayList<Bitmap>();
+            try {
+
+                s3 = new AmazonS3Client(credentialsProvider);
+
+                // Set the region of your S3 bucket
+                s3.setRegion(Region.getRegion(Regions.US_EAST_1));
+                transferUtility = new TransferUtility(s3, getApplicationContext());
+                for (S3ObjectSummary summary : S3Objects.inBucket(s3, "hhproperties")) {
+                    try {
+
+                        S3ObjectInputStream content = s3.getObject("hhproperties/"+address, "pic1").getObjectContent();
+                        byte[] bytes = IOUtils.toByteArray(content);
+                        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                        bitmaps.add(bitmap);
+                        return bitmaps;
+                    }catch(Exception e){
+                        e.printStackTrace();
+                    }
+                }
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return bitmaps;
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<Bitmap> bitmaps) {
+            imageView5.setImageBitmap(bitmaps.get(0));
+        }
+
+
+    }
 
 }
