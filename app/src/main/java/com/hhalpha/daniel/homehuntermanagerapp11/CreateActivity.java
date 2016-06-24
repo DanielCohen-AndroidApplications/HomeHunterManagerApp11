@@ -309,6 +309,7 @@ public class CreateActivity extends Activity {
         arrayList.add(path3.toString());
         arrayList.add(path4.toString());
         bundle.putStringArrayList("arrayList",arrayList);
+        bundle.putBoolean("firstTime",true);
         //TODO:Handle situations where fields are left blank/less than 3 photos are added
         Intent i = new Intent (CreateActivity.this, ConfirmActivity.class);
         i.putExtra("bundle",bundle);

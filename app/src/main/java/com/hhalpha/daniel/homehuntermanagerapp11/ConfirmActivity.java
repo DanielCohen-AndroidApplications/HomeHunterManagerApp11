@@ -125,6 +125,8 @@ public class ConfirmActivity extends Activity implements OnMapReadyCallback {
     Map<String, String> userMetadata;
     ObjectMetadata myObjectMetadata;
     ArrayList<String> abridgedList;
+    Boolean firstTime;
+    ArrayList<String> strings;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -336,6 +338,7 @@ public class ConfirmActivity extends Activity implements OnMapReadyCallback {
             }
         };
         abridgedList = new ArrayList<String>();
+        strings= new ArrayList<String>();
         bundle=getIntent().getBundleExtra("bundle");
         //TODO:Handle situations where fields are left blank/less than 3 photos are added
         textViewAddress=(TextView) findViewById(R.id.textViewAddress);
@@ -386,15 +389,26 @@ public class ConfirmActivity extends Activity implements OnMapReadyCallback {
 
 
 
-
             arrayList = bundle.getStringArrayList("arrayList");
+            Log.v("_dan confirm",arrayList.toString());
+//            firstTime= bundle.getBoolean("firstTime");
+//            if(firstTime){
+//                arrayList = bundle.getStringArrayList("arrayList");
+//            }else{
+//                strings=bundle.getStringArrayList("arrayList");
+//                for(int i=0;i<strings.size();i++){
+//                    arrayList.add(strings.get(i).replace("+",","));
+//                }
+//            }
+//
+//            Log.v("_danConfirmIntent",arrayList.toString()+firstTime.toString());
             for(int i=0;i<arrayList.size();i++){
                 Log.v("_dan arraylist",arrayList.get(i));
             }
-            textViewAddress.setText("Address: "+arrayList.get(0));
+            textViewAddress.setText("Address: "+arrayList.get(0).replace("[","").replace("+",","));
             address=arrayList.get(0);
-            for(int i=1;i<17;i++){
-                abridgedList.add(arrayList.get(i).replace(",","+").replace(" ",""));
+            for(int i=1;i<arrayList.size();i++){
+                abridgedList.add(arrayList.get(i).replace(",","+"));
             }
             //create a map to store user metadata
             myObjectMetadata = new ObjectMetadata();
@@ -412,7 +426,7 @@ public class ConfirmActivity extends Activity implements OnMapReadyCallback {
             textViewRent.setText("Rent:"+arrayList.get(2));
             textViewMinSalary.setText("Minimum Salary:"+arrayList.get(3));
             textViewShort.setText(arrayList.get(4));
-            textViewRent.setText(arrayList.get(5));
+            textViewLong.setText(arrayList.get(5));
             textViewBeds.setText(arrayList.get(6)+ " Beds");
             textViewBaths.setText(arrayList.get(7)+" Baths");
             if(arrayList.get(8).equals("true")) {
@@ -537,7 +551,7 @@ public class ConfirmActivity extends Activity implements OnMapReadyCallback {
             }
 
         }catch (Exception e ){
-            Log.v("_dan outsidetry", e.getMessage());
+            e.printStackTrace();
         }
     }
 

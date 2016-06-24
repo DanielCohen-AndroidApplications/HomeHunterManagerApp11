@@ -9,6 +9,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -40,6 +41,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Created by Daniel on 5/30/2016.
@@ -75,6 +77,19 @@ public class MainActivity extends Activity {
             adapter = new CustomListViewAdapter(getApplicationContext(), R.layout.list_layout1, propertyListEntries);
             listView = (ListView) findViewById(R.id.listView);
             listView.setAdapter(adapter);
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    Log.v("_dan click",metadataArrayList.toString());
+                    Bundle bundle=new Bundle();
+                    Intent i = new Intent(MainActivity.this, ConfirmActivity.class);
+                    bundle.putStringArrayList("arrayList",new ArrayList<String>(Arrays.asList(metadataArrayList.toString().split(","))));
+                    bundle.putBoolean("firstTime",false);
+                    i.putExtra("bundle",bundle);
+                    startActivity(i);
+                }
+
+            });
             addresses=new ArrayList<String>();
 
             listBtn = (Button) findViewById(R.id.listBtn);
