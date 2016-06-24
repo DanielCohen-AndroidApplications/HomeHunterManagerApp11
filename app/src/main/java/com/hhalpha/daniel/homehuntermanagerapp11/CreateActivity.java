@@ -93,15 +93,15 @@ public class CreateActivity extends Activity {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 // Apply the adapter to the spinner
         spinnerPayPeriods.setAdapter(adapter);
-        checkBoxCouples = (CheckBox) findViewById(R.id.checkBoxCouples);
-        checkBoxChildren = (CheckBox) findViewById(R.id.checkBoxChildren);
-        checkBoxSmallDogs = (CheckBox) findViewById(R.id.checkBoxSmallDogs);
-        checkBoxDogs = (CheckBox) findViewById(R.id.checkBoxDogs);
-        checkBoxCats = (CheckBox) findViewById(R.id.checkBoxCats);
-        checkBoxSmoking = (CheckBox) findViewById(R.id.checkBoxSmoking);
-        checkBoxGuarantor = (CheckBox) findViewById(R.id.checkBoxGuarantor);
-        checkBoxDeposit = (CheckBox) findViewById(R.id.checkBoxDeposit);
-        checkBoxDoorman = (CheckBox) findViewById(R.id.checkBoxDoorman);
+        final CheckBox checkBoxCouples = (CheckBox) findViewById(R.id.checkBoxCouples);
+        final CheckBox checkBoxChildren = (CheckBox) findViewById(R.id.checkBoxChildren);
+        final CheckBox checkBoxSmallDogs = (CheckBox) findViewById(R.id.checkBoxSmallDogs);
+        final CheckBox checkBoxDogs = (CheckBox) findViewById(R.id.checkBoxDogs);
+        final CheckBox checkBoxCats = (CheckBox) findViewById(R.id.checkBoxCats);
+        final CheckBox checkBoxSmoking = (CheckBox) findViewById(R.id.checkBoxSmoking);
+        final CheckBox checkBoxGuarantor = (CheckBox) findViewById(R.id.checkBoxGuarantor);
+        final CheckBox checkBoxDeposit = (CheckBox) findViewById(R.id.checkBoxDeposit);
+        final CheckBox checkBoxDoorman = (CheckBox) findViewById(R.id.checkBoxDoorman);
         try{
             bundle = getIntent().getBundleExtra("bundle");
             editing = bundle.getBoolean("editing");
@@ -117,6 +117,15 @@ public class CreateActivity extends Activity {
                 editTextLong.setText(editArrayList.get(6));
                 editTextBed.setText(editArrayList.get(7));
                 editTextBath.setText(editArrayList.get(8));
+                checkBoxCouples.setChecked(Boolean.parseBoolean(editArrayList.get(9).replace(" ","")));
+                checkBoxChildren.setChecked(Boolean.parseBoolean(editArrayList.get(10).replace(" ","")));
+                checkBoxSmallDogs.setChecked(Boolean.parseBoolean(editArrayList.get(11).replace(" ","")));
+                checkBoxDogs.setChecked(Boolean.parseBoolean(editArrayList.get(12).replace(" ","")));
+                checkBoxCats.setChecked(Boolean.parseBoolean(editArrayList.get(13).replace(" ","")));
+                checkBoxSmoking.setChecked(Boolean.parseBoolean(editArrayList.get(14).replace(" ","")));
+                checkBoxGuarantor.setChecked(Boolean.parseBoolean(editArrayList.get(15).replace(" ","")));
+                checkBoxDeposit.setChecked(Boolean.parseBoolean(editArrayList.get(16).replace(" ","")));
+                checkBoxDoorman.setChecked(Boolean.parseBoolean(editArrayList.get(17).replace(" ","")));
             }
         }catch (Exception e){
             e.printStackTrace();
@@ -252,6 +261,15 @@ public class CreateActivity extends Activity {
     }
 
     public void submitInfo(View v){
+        final CheckBox checkBoxCouples = (CheckBox) findViewById(R.id.checkBoxCouples);
+        final CheckBox checkBoxChildren = (CheckBox) findViewById(R.id.checkBoxChildren);
+        final CheckBox checkBoxSmallDogs = (CheckBox) findViewById(R.id.checkBoxSmallDogs);
+        final CheckBox checkBoxDogs = (CheckBox) findViewById(R.id.checkBoxDogs);
+        final CheckBox checkBoxCats = (CheckBox) findViewById(R.id.checkBoxCats);
+        final CheckBox checkBoxSmoking = (CheckBox) findViewById(R.id.checkBoxSmoking);
+        final CheckBox checkBoxGuarantor = (CheckBox) findViewById(R.id.checkBoxGuarantor);
+        final CheckBox checkBoxDeposit = (CheckBox) findViewById(R.id.checkBoxDeposit);
+        final CheckBox checkBoxDoorman = (CheckBox) findViewById(R.id.checkBoxDoorman);
         Bundle bundle = new Bundle();
         ArrayList<String> arrayList = new ArrayList<String>();
         booleans=new ArrayList<Boolean>();
