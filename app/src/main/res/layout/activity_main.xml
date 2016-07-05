@@ -4,14 +4,7 @@
     android:layout_height="match_parent"
     android:background="#000000">
 
-    <Button
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="See my properties"
-        android:id="@+id/listBtn"
-        android:layout_gravity="center_horizontal"
-        android:onClick="listProperties"/>
+
 
     <Button
         android:layout_width="wrap_content"
@@ -26,7 +19,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Large Text"
+        android:text="Loading..."
         android:id="@+id/textViewTest"
         android:layout_gravity="center_horizontal"
         android:textColor="#a7a7a7"/>

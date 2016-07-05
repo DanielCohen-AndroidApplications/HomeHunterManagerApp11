@@ -99,6 +99,7 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -116,6 +117,7 @@ public class ConfirmActivity extends Activity implements OnMapReadyCallback {
     TextView textViewAddress,textViewSqft,textViewRent, textViewMinSalary, textViewShort, textViewLong, textViewBeds, textViewBaths, textViewCouples, textViewChildren, textViewSmallDogs, textViewDogs, textViewCats, textViewSmoking, textViewGuarantor, textViewSecurity, textViewDoorman;
     Bundle bundle;
     ArrayList<String> arrayList;
+    ArrayList<String> coordinates;
     private CognitoCachingCredentialsProvider credentialsProvider;
     CognitoSyncManager syncClient;
     AmazonS3 s3;
@@ -137,6 +139,7 @@ public class ConfirmActivity extends Activity implements OnMapReadyCallback {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_confirm);
+
         dynamoDB=new AmazonDynamoDB() {
             @Override
             public void setEndpoint(String endpoint) throws IllegalArgumentException {
@@ -343,8 +346,10 @@ public class ConfirmActivity extends Activity implements OnMapReadyCallback {
                 return null;
             }
         };
+
         abridgedList = new ArrayList<String>();
         strings= new ArrayList<String>();
+        coordinates=new ArrayList<String>();
         bundle=getIntent().getBundleExtra("bundle");
         firstTime=bundle.getBoolean("firstTime");
 
@@ -598,7 +603,7 @@ public class ConfirmActivity extends Activity implements OnMapReadyCallback {
                 property.setAddress(address);
 
 
-                property.setDataString(arrayList.subList(1,16).toString().replace(",",""));
+                property.setDataString(arrayList.subList(1,16).toString().replace(",","")+coordinates.toString());
                 mapper.save(property);
 
 
@@ -675,7 +680,9 @@ public class ConfirmActivity extends Activity implements OnMapReadyCallback {
                 lat = ((JSONArray)jsonObject.get("results")).getJSONObject(0)
                         .getJSONObject("geometry").getJSONObject("location")
                         .getDouble("lat");
-
+                coordinates.add(lat+"");
+                coordinates.add(lng+"");
+                userMetadata.put("coords",coordinates.toString());
                 Log.d("latitude", "" + lat);
                 Log.d("longitude", "" + lng);
             } catch (JSONException e) {
@@ -778,6 +785,7 @@ public class ConfirmActivity extends Activity implements OnMapReadyCallback {
         Intent i = new Intent(ConfirmActivity.this,CreateActivity.class);
         bundle.putBoolean("editing",true);
         bundle.putStringArrayList("arrayList",arrayList);
+        bundle.putStringArrayList("coordinates",coordinates);
         i.putExtra("bundle",bundle);
         startActivity(i);
     }

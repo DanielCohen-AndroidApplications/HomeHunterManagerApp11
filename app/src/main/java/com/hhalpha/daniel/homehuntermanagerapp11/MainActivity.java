@@ -92,7 +92,7 @@ public class MainActivity extends Activity {
             });
             addresses=new ArrayList<String>();
 
-            listBtn = (Button) findViewById(R.id.listBtn);
+
             createBtn = (Button) findViewById(R.id.createBtn);
             imageViewTest = (ImageView) findViewById(R.id.imageViewTest);
             textViewTest = (TextView) findViewById(R.id.textViewTest);
@@ -152,6 +152,7 @@ public class MainActivity extends Activity {
                         ObjectMetadata metadata = s3.getObject("hhproperties", key).getObjectMetadata();
                         Log.v("_dan meta",metadata.getUserMetaDataOf("info").toString());
                         metadataArrayList.add(metadata.getUserMetaDataOf("info").toString());
+                        metadataArrayList.add(metadata.getUserMetaDataOf("coords").toString());
                         byte[] bytes = IOUtils.toByteArray(content);
                         Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
 
