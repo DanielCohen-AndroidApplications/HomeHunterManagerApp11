@@ -1,6 +1,10 @@
 package com.hhalpha.daniel.homehuntermanagerapp11;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -8,12 +12,14 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
 import com.amazonaws.mobileconnectors.cognito.CognitoSyncManager;
@@ -90,6 +96,59 @@ public class MainActivity extends Activity {
                 }
 
             });
+            listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+
+                public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                    Toast.makeText(getBaseContext(), propertyListEntries.get(position).getPropertyText(),
+                            Toast.LENGTH_LONG).show();
+
+
+                    final AlertDialog.Builder Dialog = new AlertDialog.Builder(MainActivity.this);
+                    Dialog.setTitle(propertyListEntries.get(position).getPropertyText());
+
+
+                    Dialog.setPositiveButton("Set viewing schedule", new DialogInterface.OnClickListener()
+                    {
+                        public void onClick(DialogInterface arg0, int arg1)
+                        {
+                        }
+                    });
+
+                    Dialog.setNegativeButton("Delete property", new DialogInterface.OnClickListener()
+                    {
+                        public void onClick(DialogInterface arg0, int arg1)
+                        {
+                            final AlertDialog.Builder ConfirmDialog = new AlertDialog.Builder(MainActivity.this);
+                            ConfirmDialog.setTitle("Are you sure you want to delete this property?");
+                            ConfirmDialog.setPositiveButton("Yes, Delete it", new DialogInterface.OnClickListener()
+                            {
+                                public void onClick(DialogInterface arg0, int arg1)
+                                {
+                                }
+                            });
+
+                            ConfirmDialog.setNegativeButton("No, go back", new DialogInterface.OnClickListener()
+                            {
+                                public void onClick(DialogInterface arg0, int arg1)
+                                {
+
+                                }
+                            });
+                            ConfirmDialog.show();
+                        }
+                    });
+                    Dialog.show();
+
+
+                    return true;
+                }
+
+
+            });
+
+
+
+
             addresses=new ArrayList<String>();
 
 
