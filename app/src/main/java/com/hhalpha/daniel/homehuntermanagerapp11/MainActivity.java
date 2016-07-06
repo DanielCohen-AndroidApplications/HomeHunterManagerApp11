@@ -80,6 +80,7 @@ public class MainActivity extends Activity {
     ListView listView;
     ArrayList<String> metadataArrayList;
     int itemPosition;
+    AlertDialog.Builder Dialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -112,7 +113,7 @@ public class MainActivity extends Activity {
                             Toast.LENGTH_LONG).show();
 
 
-                    final AlertDialog.Builder Dialog = new AlertDialog.Builder(MainActivity.this);
+                    Dialog = new AlertDialog.Builder(MainActivity.this);
                     Dialog.setTitle(propertyListEntries.get(position).getPropertyText().replace("/pic1",""));
 
 
@@ -120,51 +121,41 @@ public class MainActivity extends Activity {
                     {
                         public void onClick(DialogInterface arg0, int arg1)
                         {
-//                            Intent i = new Intent(MainActivity.this,ScheduleActivity.class);
-//                            Bundle bundle = new Bundle();
-//                            bundle.putStringArrayList("arrayList",new ArrayList<String>(Arrays.asList(metadataArrayList.toString().split(","))));
-//                            bundle.putBoolean("firstTime",false);
-//                            i.putExtra("bundle",bundle);
-//                            startActivity(i);
-                            try{
-                                //Initialize CustomCalendarView from layout
-                                CustomCalendarView calendarView = (CustomCalendarView) findViewById(R.id.calendar_view);
-
-//Initialize calendar with date
-                                Calendar currentCalendar = Calendar.getInstance(Locale.getDefault());
-
-
-
-//Show/hide overflow days of a month
-                                calendarView.setShowOverflowDate(false);
-
-//call refreshCalendar to update calendar the view
-                                calendarView.refreshCalendar(currentCalendar);
-
-//Handling custom calendar events
-                                calendarView.setCalendarListener(new CalendarListener() {
-                                    @Override
-                                    public void onDateSelected(Date date) {
-                                        SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
-                                        Toast.makeText(MainActivity.this, df.format(date), Toast.LENGTH_SHORT).show();
-                                    }
-
-                                    @Override
-                                    public void onMonthChanged(Date date) {
-                                        SimpleDateFormat df = new SimpleDateFormat("MM-yyyy");
-                                        Toast.makeText(MainActivity.this, df.format(date), Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                                //Setting custom font
-//                                final Typeface typeface = Typeface.createFromAsset(getAssets(), "fonts/Arch_Rival_Bold.ttf");
-//                                if (null != typeface) {
-//                                    calendarView.setCustomTypeface(typeface);
-//                                    calendarView.refreshCalendar(currentCalendar);
-//                                }
-                                calendarView.setVisibility(View.VISIBLE);
-                            }catch (Exception e){
-                                e.printStackTrace();
-                            }
+                            goToCalendar();
+//                            try{
+//                                //Initialize CustomCalendarView from layout
+//                                CustomCalendarView calendarView = (CustomCalendarView) findViewById(R.id.calendar_view);
+//
+////Initialize calendar with date
+//                                Calendar currentCalendar = Calendar.getInstance(Locale.getDefault());
+//
+//
+//
+////Show/hide overflow days of a month
+//                                calendarView.setShowOverflowDate(false);
+//
+////call refreshCalendar to update calendar the view
+//                                calendarView.refreshCalendar(currentCalendar);
+//
+////Handling custom calendar events
+//                                calendarView.setCalendarListener(new CalendarListener() {
+//                                    @Override
+//                                    public void onDateSelected(Date date) {
+//                                        SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
+//                                        Toast.makeText(MainActivity.this, df.format(date), Toast.LENGTH_SHORT).show();
+//                                    }
+//
+//                                    @Override
+//                                    public void onMonthChanged(Date date) {
+//                                        SimpleDateFormat df = new SimpleDateFormat("MM-yyyy");
+//                                        Toast.makeText(MainActivity.this, df.format(date), Toast.LENGTH_SHORT).show();
+//                                    }
+//                                });
+//                                Dialog.setView(calendarView);
+//                                calendarView.setVisibility(View.VISIBLE);
+//                            }catch (Exception e){
+//                                e.printStackTrace();
+//                            }
                         }
                     });
 
@@ -236,7 +227,14 @@ public class MainActivity extends Activity {
     public void listProperties(View v){
 
     }
-
+    public void goToCalendar(){
+        Intent i = new Intent(MainActivity.this,ScheduleActivity.class);
+//                            Bundle bundle = new Bundle();
+//                            bundle.putStringArrayList("arrayList",new ArrayList<String>(Arrays.asList(metadataArrayList.toString().split(","))));
+//                            bundle.putBoolean("firstTime",false);
+//                            i.putExtra("bundle",bundle);
+        startActivity(i);
+    }
     public void createNewProperty(View v){
         Intent i= new Intent(MainActivity.this, CreateActivity.class);
         Bundle bundle = new Bundle();

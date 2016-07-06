@@ -3,6 +3,7 @@ package com.hhalpha.daniel.homehuntermanagerapp11;
 import android.app.Activity;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.CalendarView;
 import android.widget.Toast;
 
@@ -20,46 +21,50 @@ import java.util.Locale;
  * Created by Daniel on 7/5/2016.
  */
 public class ScheduleActivity extends Activity {
-    CustomCalendarView calendarView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        //Initialize CustomCalendarView from layout
-        calendarView = (CustomCalendarView) findViewById(R.id.calendar_view);
+        setContentView(R.layout.activity_schedule);
+        try{
+            //Initialize CustomCalendarView from layout
+            CustomCalendarView calendarView = (CustomCalendarView) findViewById(R.id.calendar_view);
 
 //Initialize calendar with date
-        Calendar currentCalendar = Calendar.getInstance(Locale.getDefault());
+            Calendar currentCalendar = Calendar.getInstance(Locale.getDefault());
 
 
 
 //Show/hide overflow days of a month
-        calendarView.setShowOverflowDate(false);
+            calendarView.setShowOverflowDate(false);
 
 //call refreshCalendar to update calendar the view
-        calendarView.refreshCalendar(currentCalendar);
+            calendarView.refreshCalendar(currentCalendar);
 
 //Handling custom calendar events
-        calendarView.setCalendarListener(new CalendarListener() {
-            @Override
-            public void onDateSelected(Date date) {
-                SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
-                Toast.makeText(ScheduleActivity.this, df.format(date), Toast.LENGTH_SHORT).show();
-            }
+            calendarView.setCalendarListener(new CalendarListener() {
+                @Override
+                public void onDateSelected(Date date) {
+                    SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
+                    Toast.makeText(ScheduleActivity.this, df.format(date), Toast.LENGTH_SHORT).show();
+                }
 
-            @Override
-            public void onMonthChanged(Date date) {
-                SimpleDateFormat df = new SimpleDateFormat("MM-yyyy");
-                Toast.makeText(ScheduleActivity.this, df.format(date), Toast.LENGTH_SHORT).show();
-            }
-        });
-        //Setting custom font
-        final Typeface typeface = Typeface.createFromAsset(getAssets(), "fonts/Arch_Rival_Bold.ttf");
-        if (null != typeface) {
-            calendarView.setCustomTypeface(typeface);
-            calendarView.refreshCalendar(currentCalendar);
+                @Override
+                public void onMonthChanged(Date date) {
+                    SimpleDateFormat df = new SimpleDateFormat("MM-yyyy");
+                    Toast.makeText(ScheduleActivity.this, df.format(date), Toast.LENGTH_SHORT).show();
+                }
+            });
+            //Setting custom font
+//                                final Typeface typeface = Typeface.createFromAsset(getAssets(), "fonts/Arch_Rival_Bold.ttf");
+//                                if (null != typeface) {
+//                                    calendarView.setCustomTypeface(typeface);
+//                                    calendarView.refreshCalendar(currentCalendar);
+//                                }
+//            calendarView.setVisibility(View.VISIBLE);
+        }catch (Exception e){
+            e.printStackTrace();
         }
-
 
     }
 }
