@@ -3,6 +3,7 @@ package com.hhalpha.daniel.homehuntermanagerapp11;
 import android.app.Activity;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.CalendarView;
 import android.widget.Toast;
@@ -21,11 +22,18 @@ import java.util.Locale;
  * Created by Daniel on 7/5/2016.
  */
 public class ScheduleActivity extends Activity {
-
+    String string;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_schedule);
+        try{
+            Bundle bundle = getIntent().getBundleExtra("bundle");
+            string=bundle.getString("string");
+            Log.v("_danschedule",string);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
         try{
             //Initialize CustomCalendarView from layout
             CustomCalendarView calendarView = (CustomCalendarView) findViewById(R.id.calendar_view);
@@ -47,6 +55,8 @@ public class ScheduleActivity extends Activity {
                 public void onDateSelected(Date date) {
                     SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
                     Toast.makeText(ScheduleActivity.this, df.format(date), Toast.LENGTH_SHORT).show();
+                    CustomDialogClass cdd=new CustomDialogClass(ScheduleActivity.this);
+                    cdd.show();
                 }
 
                 @Override
@@ -55,13 +65,7 @@ public class ScheduleActivity extends Activity {
                     Toast.makeText(ScheduleActivity.this, df.format(date), Toast.LENGTH_SHORT).show();
                 }
             });
-            //Setting custom font
-//                                final Typeface typeface = Typeface.createFromAsset(getAssets(), "fonts/Arch_Rival_Bold.ttf");
-//                                if (null != typeface) {
-//                                    calendarView.setCustomTypeface(typeface);
-//                                    calendarView.refreshCalendar(currentCalendar);
-//                                }
-//            calendarView.setVisibility(View.VISIBLE);
+
         }catch (Exception e){
             e.printStackTrace();
         }

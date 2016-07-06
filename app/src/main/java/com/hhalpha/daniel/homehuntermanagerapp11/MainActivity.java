@@ -122,40 +122,7 @@ public class MainActivity extends Activity {
                         public void onClick(DialogInterface arg0, int arg1)
                         {
                             goToCalendar();
-//                            try{
-//                                //Initialize CustomCalendarView from layout
-//                                CustomCalendarView calendarView = (CustomCalendarView) findViewById(R.id.calendar_view);
-//
-////Initialize calendar with date
-//                                Calendar currentCalendar = Calendar.getInstance(Locale.getDefault());
-//
-//
-//
-////Show/hide overflow days of a month
-//                                calendarView.setShowOverflowDate(false);
-//
-////call refreshCalendar to update calendar the view
-//                                calendarView.refreshCalendar(currentCalendar);
-//
-////Handling custom calendar events
-//                                calendarView.setCalendarListener(new CalendarListener() {
-//                                    @Override
-//                                    public void onDateSelected(Date date) {
-//                                        SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
-//                                        Toast.makeText(MainActivity.this, df.format(date), Toast.LENGTH_SHORT).show();
-//                                    }
-//
-//                                    @Override
-//                                    public void onMonthChanged(Date date) {
-//                                        SimpleDateFormat df = new SimpleDateFormat("MM-yyyy");
-//                                        Toast.makeText(MainActivity.this, df.format(date), Toast.LENGTH_SHORT).show();
-//                                    }
-//                                });
-//                                Dialog.setView(calendarView);
-//                                calendarView.setVisibility(View.VISIBLE);
-//                            }catch (Exception e){
-//                                e.printStackTrace();
-//                            }
+
                         }
                     });
 
@@ -229,10 +196,9 @@ public class MainActivity extends Activity {
     }
     public void goToCalendar(){
         Intent i = new Intent(MainActivity.this,ScheduleActivity.class);
-//                            Bundle bundle = new Bundle();
-//                            bundle.putStringArrayList("arrayList",new ArrayList<String>(Arrays.asList(metadataArrayList.toString().split(","))));
-//                            bundle.putBoolean("firstTime",false);
-//                            i.putExtra("bundle",bundle);
+        Bundle bundle = new Bundle();
+        bundle.putString("string",new ArrayList<String>(Arrays.asList(metadataArrayList.toString().split(","))).get(itemPosition));
+        i.putExtra("bundle",bundle);
         startActivity(i);
     }
     public void createNewProperty(View v){
