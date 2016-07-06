@@ -43,6 +43,8 @@
         </activity>
         <activity android:name=".ConfirmActivity">
         </activity>
+        <activity android:name=".ScheduleActivity">
+        </activity>
         <service android:name="com.amazonaws.mobileconnectors.s3.transferutility.TransferService" android:enabled="true" />
     </application>
 

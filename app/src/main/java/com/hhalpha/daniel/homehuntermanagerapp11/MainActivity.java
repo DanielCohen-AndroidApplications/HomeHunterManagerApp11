@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -40,14 +41,20 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.amazonaws.util.IOUtils;
+import com.imanoweb.calendarview.CalendarListener;
+import com.imanoweb.calendarview.CustomCalendarView;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  * Created by Daniel on 5/30/2016.
@@ -72,6 +79,7 @@ public class MainActivity extends Activity {
     ArrayList<PropertyListEntry> propertyListEntries;
     ListView listView;
     ArrayList<String> metadataArrayList;
+    int itemPosition;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,18 +107,64 @@ public class MainActivity extends Activity {
             listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 
                 public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                    itemPosition = position;
                     Toast.makeText(getBaseContext(), propertyListEntries.get(position).getPropertyText(),
                             Toast.LENGTH_LONG).show();
 
 
                     final AlertDialog.Builder Dialog = new AlertDialog.Builder(MainActivity.this);
-                    Dialog.setTitle(propertyListEntries.get(position).getPropertyText());
+                    Dialog.setTitle(propertyListEntries.get(position).getPropertyText().replace("/pic1",""));
 
 
                     Dialog.setPositiveButton("Set viewing schedule", new DialogInterface.OnClickListener()
                     {
                         public void onClick(DialogInterface arg0, int arg1)
                         {
+//                            Intent i = new Intent(MainActivity.this,ScheduleActivity.class);
+//                            Bundle bundle = new Bundle();
+//                            bundle.putStringArrayList("arrayList",new ArrayList<String>(Arrays.asList(metadataArrayList.toString().split(","))));
+//                            bundle.putBoolean("firstTime",false);
+//                            i.putExtra("bundle",bundle);
+//                            startActivity(i);
+                            try{
+                                //Initialize CustomCalendarView from layout
+                                CustomCalendarView calendarView = (CustomCalendarView) findViewById(R.id.calendar_view);
+
+//Initialize calendar with date
+                                Calendar currentCalendar = Calendar.getInstance(Locale.getDefault());
+
+
+
+//Show/hide overflow days of a month
+                                calendarView.setShowOverflowDate(false);
+
+//call refreshCalendar to update calendar the view
+                                calendarView.refreshCalendar(currentCalendar);
+
+//Handling custom calendar events
+                                calendarView.setCalendarListener(new CalendarListener() {
+                                    @Override
+                                    public void onDateSelected(Date date) {
+                                        SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
+                                        Toast.makeText(MainActivity.this, df.format(date), Toast.LENGTH_SHORT).show();
+                                    }
+
+                                    @Override
+                                    public void onMonthChanged(Date date) {
+                                        SimpleDateFormat df = new SimpleDateFormat("MM-yyyy");
+                                        Toast.makeText(MainActivity.this, df.format(date), Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                                //Setting custom font
+//                                final Typeface typeface = Typeface.createFromAsset(getAssets(), "fonts/Arch_Rival_Bold.ttf");
+//                                if (null != typeface) {
+//                                    calendarView.setCustomTypeface(typeface);
+//                                    calendarView.refreshCalendar(currentCalendar);
+//                                }
+                                calendarView.setVisibility(View.VISIBLE);
+                            }catch (Exception e){
+                                e.printStackTrace();
+                            }
                         }
                     });
 
@@ -119,7 +173,7 @@ public class MainActivity extends Activity {
                         public void onClick(DialogInterface arg0, int arg1)
                         {
                             final AlertDialog.Builder ConfirmDialog = new AlertDialog.Builder(MainActivity.this);
-                            ConfirmDialog.setTitle("Are you sure you want to delete this property?");
+                            ConfirmDialog.setTitle("Are you sure you want to delete"+propertyListEntries.get(itemPosition).getPropertyText().replace("/pic1",""));
                             ConfirmDialog.setPositiveButton("Yes, Delete it", new DialogInterface.OnClickListener()
                             {
                                 public void onClick(DialogInterface arg0, int arg1)
