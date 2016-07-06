@@ -15,7 +15,7 @@ public class CustomDialogClass extends Dialog implements
 
     public Activity c;
     public Dialog d;
-    public Button yes, no;
+    public Button yes;
 
     public CustomDialogClass(Activity a) {
         super(a);
@@ -29,9 +29,9 @@ public class CustomDialogClass extends Dialog implements
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.custom_dialog);
         yes = (Button) findViewById(R.id.btn_yes);
-        no = (Button) findViewById(R.id.btn_no);
+
         yes.setOnClickListener(this);
-        no.setOnClickListener(this);
+
 
     }
 
@@ -41,9 +41,7 @@ public class CustomDialogClass extends Dialog implements
             case R.id.btn_yes:
                 c.finish();
                 break;
-            case R.id.btn_no:
-                dismiss();
-                break;
+
             default:
                 break;
         }

@@ -1,5 +1,4 @@
 package com.hhalpha.daniel.homehuntermanagerapp11;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -181,8 +180,8 @@ public class MainActivity extends Activity {
                     getApplicationContext(),
                     Regions.US_EAST_1, // Region
                     credentialsProvider);
-            AmazonDynamoDBClient ddbClient = new AmazonDynamoDBClient(credentialsProvider);
-            mapper = new DynamoDBMapper(ddbClient);
+//            AmazonDynamoDBClient ddbClient = new AmazonDynamoDBClient(credentialsProvider);
+//            mapper = new DynamoDBMapper(ddbClient);
 
 
             new retrieveTask().execute();
@@ -215,6 +214,9 @@ public class MainActivity extends Activity {
         protected ArrayList<String> doInBackground(String... params) {
 
             try {
+                Log.v("_dan token",credentialsProvider.getToken());
+
+                credentialsProvider.refresh();
 
                 s3 = new AmazonS3Client(credentialsProvider);
 
