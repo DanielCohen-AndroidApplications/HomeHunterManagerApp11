@@ -1,6 +1,7 @@
 package com.hhalpha.daniel.homehuntermanagerapp11;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
@@ -25,6 +26,9 @@ import java.util.Locale;
 public class ScheduleActivity extends Activity {
     String string;
     TextView textDia;
+    CustomCalendarView calendarView;
+    Calendar currentCalendar;
+    List<DayDecorator> list;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,14 +41,21 @@ public class ScheduleActivity extends Activity {
         }catch(Exception e){
             e.printStackTrace();
         }
+        try {
+            list=new ArrayList<>();
+            list.add(new DaysDecorator());
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         try{
             //Initialize CustomCalendarView from layout
-            CustomCalendarView calendarView = (CustomCalendarView) findViewById(R.id.calendar_view);
+            calendarView = (CustomCalendarView) findViewById(R.id.calendar_view);
 
 //Initialize calendar with date
-            Calendar currentCalendar = Calendar.getInstance(Locale.getDefault());
+            currentCalendar = Calendar.getInstance(Locale.getDefault());
 
-
+            calendarView.setDecorators(list);
 
 //Show/hide overflow days of a month
             calendarView.setShowOverflowDate(false);
@@ -79,5 +90,31 @@ public class ScheduleActivity extends Activity {
             e.printStackTrace();
         }
 
+    }
+    private class DaysDecorator implements DayDecorator {
+        @Override
+        public void decorate(DayView dayView) {
+            if(isPastDay(dayView.getDate())){
+                dayView.setBackgroundColor(Color.parseColor("#a7a7FF"));
+            }
+        }
+    }
+    private boolean isPastDay(Date date) {
+        Calendar c = Calendar.getInstance();
+
+        // set the calendar to start of today
+        c.set(Calendar.HOUR_OF_DAY, 0);
+        c.set(Calendar.MINUTE, 0);
+        c.set(Calendar.SECOND, 0);
+        c.set(Calendar.MILLISECOND, 0);
+
+        // and get that as a Date
+        Date today = c.getTime();
+
+        // test your condition, if Date specified is before today
+        if (date.before(today)) {
+            return true;
+        }
+        return false;
     }
 }
