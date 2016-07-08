@@ -29,11 +29,19 @@ public class ScheduleActivity extends Activity {
     CustomCalendarView calendarView;
     Calendar currentCalendar;
     List<DayDecorator> list;
+    ArrayList<Date> dates;
+    Date parsedDate;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_schedule);
-
+        dates=new ArrayList<>();
+        try {
+            dates.add(new SimpleDateFormat("dd-MM-yyyy").parse("10-07-2016"));
+            Log.v("_dan dates",new SimpleDateFormat("dd-MM-yyyy").parse("10-07-2016").toString());
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         try{
             Bundle bundle = getIntent().getBundleExtra("bundle");
             string=bundle.getString("string");
@@ -97,6 +105,25 @@ public class ScheduleActivity extends Activity {
             if(isPastDay(dayView.getDate())){
                 dayView.setBackgroundColor(Color.parseColor("#a7a7FF"));
             }
+//            try {
+//                parsedDate = dayView.getDate();
+//                Log.v("_dan parsedDate",parsedDate.toString());
+//            }catch(Exception e){
+//                e.printStackTrace();
+//            }
+//            try {
+            try {
+                Log.v("_dan datedeco", dates.toString().split(" ")[0] + dates.toString().split(" ")[1] + dates.toString().split(" ")[2]);
+                Log.v("_dan datedeco2", dayView.getDate().toString().split(" ")[0]+dayView.getDate().toString().split(" ")[1]+dayView.getDate().toString().split(" ")[2]);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+                if (dates.toString().contains(dayView.getDate().toString().split(" ")[0]+" "+dayView.getDate().toString().split(" ")[1]+" "+dayView.getDate().toString().split(" ")[2])) {
+                    dayView.setBackgroundColor(Color.parseColor("#FFa7a7"));
+                }
+//            }catch (Exception e){
+//                e.printStackTrace();
+//            }
         }
     }
     private boolean isPastDay(Date date) {
