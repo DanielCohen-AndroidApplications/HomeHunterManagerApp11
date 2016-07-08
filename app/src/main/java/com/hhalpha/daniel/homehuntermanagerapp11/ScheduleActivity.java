@@ -56,6 +56,7 @@ public class ScheduleActivity extends Activity {
                     SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
                     Toast.makeText(ScheduleActivity.this, df.format(date), Toast.LENGTH_SHORT).show();
                     CustomDialogClass cdd=new CustomDialogClass(ScheduleActivity.this);
+                    cdd.setTitle("Schedule a viewing time for "+string.replace("[","").replace("+",""));
                     cdd.show();
                 }
 
