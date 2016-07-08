@@ -21,6 +21,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import java.util.Calendar;
 
@@ -33,20 +34,27 @@ public class CustomDialogClass extends Dialog implements
     public Activity c;
 
     public Button yes;
+    TextView txt_dia;
 
     Spinner spinnerHours, spinnerMinutes;
-    String hours, mins;
-    public CustomDialogClass(Activity a) {
+    String hours, mins, date, address;
+    public CustomDialogClass(Activity a, Bundle args) {
         super(a);
         // TODO Auto-generated constructor stub
         this.c = a;
+        address=args.getString("address");
+        date=args.getString("date");
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+
         setContentView(R.layout.custom_dialog);
+
+        txt_dia=(TextView)findViewById(R.id.txt_dia);
+        txt_dia.setText(date+"\n"+address);
         yes = (Button) findViewById(R.id.btn_yes);
 
         yes.setOnClickListener(this);
@@ -86,13 +94,14 @@ public class CustomDialogClass extends Dialog implements
                 mins="00";
             }
         });
+
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_yes:
-                Log.v("_dandia","hours="+hours+"mins="+mins);
+                Log.v("_dandia",address+"hours="+hours+"mins="+mins);
 
                 dismiss();
         }

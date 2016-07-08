@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.CalendarView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.imanoweb.calendarview.CalendarListener;
@@ -23,10 +24,12 @@ import java.util.Locale;
  */
 public class ScheduleActivity extends Activity {
     String string;
+    TextView textDia;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_schedule);
+
         try{
             Bundle bundle = getIntent().getBundleExtra("bundle");
             string=bundle.getString("string");
@@ -53,11 +56,16 @@ public class ScheduleActivity extends Activity {
             calendarView.setCalendarListener(new CalendarListener() {
                 @Override
                 public void onDateSelected(Date date) {
+                    Bundle bundle = new Bundle();
+                    bundle.putString("address",string.replace("[","").replace("+",""));
+                    bundle.putString("date",date.toString());
                     SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
                     Toast.makeText(ScheduleActivity.this, df.format(date), Toast.LENGTH_SHORT).show();
-                    CustomDialogClass cdd=new CustomDialogClass(ScheduleActivity.this);
-                    cdd.setTitle("Schedule a viewing time for "+string.replace("[","").replace("+",""));
+                    CustomDialogClass cdd=new CustomDialogClass(ScheduleActivity.this, bundle);
+//                    cdd.setTitle(string.replace("[","").replace("+",""));
+
                     cdd.show();
+
                 }
 
                 @Override
