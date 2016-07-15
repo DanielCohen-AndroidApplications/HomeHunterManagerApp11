@@ -85,15 +85,11 @@ import java.util.Map;
  */
 public class ScheduleActivity extends Activity {
     String string;
-    TextView textDia;
     CustomCalendarView calendarView;
     Calendar currentCalendar;
     List<DayDecorator> list;
     ArrayList<Date> dates;
-    Date parsedDate;
-    SharedPreferences prefs;
     DynamoDBMapper mapper;
-    String idPool;
     CognitoCachingCredentialsProvider credentialsProvider;
     CognitoSyncManager syncClient;
     Timeslot timeslot;
@@ -103,7 +99,8 @@ public class ScheduleActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_schedule);
-        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        //Initialize CustomCalendarView from layout
+        calendarView = (CustomCalendarView) findViewById(R.id.calendar_view);
         FacebookSdk.sdkInitialize(getApplicationContext());
         try{
             credentialsProvider = new CognitoCachingCredentialsProvider(
@@ -346,13 +343,37 @@ public class ScheduleActivity extends Activity {
 
     public class DaysDecorator implements DayDecorator {
         @Override
-        public void decorate(DayView dayView) {
+        public void decorate(final DayView dayView) {
 
             for(int i = 0; i<dates.size();i++) {
                 if (dates.get(i).toString().replace("[","").replace("]","").contains(dayView.getDate().toString().split(" ")[0] + " " + dayView.getDate().toString().split(" ")[1] + " " + dayView.getDate().toString().split(" ")[2])) {
 
                     dayView.setBackgroundColor(Color.parseColor("#FFa7a7"));
                     dayView.setText(dayView.getText().toString()+"\n"+dates.get(i));
+                    dayView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            try {
+                                Bundle bundle = new Bundle();
+                                bundle.putString("address", string.replace("[", "").replace("+", ""));
+                                bundle.putString("date", dayView.getDate().toString());
+                                SimpleDateFormat df = new SimpleDateFormat("EEE MMM dd hh:mm a yyyy");
+                                Toast.makeText(ScheduleActivity.this, df.format(dayView.getDate()), Toast.LENGTH_SHORT).show();
+                                CustomDialogClass cdd = new CustomDialogClass(ScheduleActivity.this, bundle);
+//                    cdd.setTitle(string.replace("[","").replace("+",""));
+                                cdd.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                                    @Override
+                                    public void onDismiss(DialogInterface dialog) {
+                                        Intent i = getIntent();
+                                        startActivity(i);
+                                    }
+                                });
+                                cdd.show();
+                            }catch(Exception e){
+                                e.printStackTrace();
+                            }
+                        }
+                    });
                 }
 
             }
@@ -415,13 +436,13 @@ public class ScheduleActivity extends Activity {
                     if(result.get(i).getTime().toString().split("@")[1].toString().contains(string.replace("[","").replace("]","").replace("+","").replace(",",""))) {
                         dates.add(new SimpleDateFormat("EEE MMM dd hh:mm a yyyy").parse(result.get(i).getTime().toString().split("@")[0].toString()));
                     }
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                    Log.v("_dan ddbScan", result.get(i).getTime().toString());
-
+                }catch (Exception e){
+                    e.printStackTrace();
                 }
-                Log.v("_dan dates after scan", dates.toString());
+                Log.v("_dan ddbScan", result.get(i).getTime().toString());
+
+            }
+            Log.v("_dan dates after scan", dates.toString());
 
             return null;
         }
@@ -442,8 +463,7 @@ public class ScheduleActivity extends Activity {
             e.printStackTrace();
         }
         try{
-            //Initialize CustomCalendarView from layout
-            calendarView = (CustomCalendarView) findViewById(R.id.calendar_view);
+
 
 //Initialize calendar with date
             currentCalendar = Calendar.getInstance(Locale.getDefault());
@@ -460,23 +480,25 @@ public class ScheduleActivity extends Activity {
             calendarView.setCalendarListener(new CalendarListener() {
                 @Override
                 public void onDateSelected(Date date) {
-                    Bundle bundle = new Bundle();
-                    bundle.putString("address",string.replace("[","").replace("+",""));
-                    bundle.putString("date",date.toString());
-                    SimpleDateFormat df = new SimpleDateFormat("EEE MMM dd hh:mm a yyyy");
-                    Toast.makeText(ScheduleActivity.this, df.format(date), Toast.LENGTH_SHORT).show();
-                    CustomDialogClass cdd=new CustomDialogClass(ScheduleActivity.this, bundle);
+                    try {
+                        Bundle bundle = new Bundle();
+                        bundle.putString("address", string.replace("[", "").replace("+", ""));
+                        bundle.putString("date", date.toString());
+                        SimpleDateFormat df = new SimpleDateFormat("EEE MMM dd hh:mm a yyyy");
+                        Toast.makeText(ScheduleActivity.this, df.format(date), Toast.LENGTH_SHORT).show();
+                        CustomDialogClass cdd = new CustomDialogClass(ScheduleActivity.this, bundle);
 //                    cdd.setTitle(string.replace("[","").replace("+",""));
-                    cdd.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                        @Override
-                        public void onDismiss(DialogInterface dialog) {
-                            Intent i = getIntent();
-                            startActivity(i);
-                        }
-                    });
-
-                    cdd.show();
-
+                        cdd.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                            @Override
+                            public void onDismiss(DialogInterface dialog) {
+                                Intent i = getIntent();
+                                startActivity(i);
+                            }
+                        });
+                        cdd.show();
+                    }catch(Exception e){
+                        e.printStackTrace();
+                    }
                 }
 
                 @Override
