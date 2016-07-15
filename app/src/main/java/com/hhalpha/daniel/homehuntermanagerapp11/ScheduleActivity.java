@@ -2,6 +2,7 @@ package com.hhalpha.daniel.homehuntermanagerapp11;
 
 import android.app.Activity;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -336,6 +337,13 @@ public class ScheduleActivity extends Activity {
 
         new retrieveTask().execute();
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        initializeCalendar();
+    }
+
     public class DaysDecorator implements DayDecorator {
         @Override
         public void decorate(DayView dayView) {
@@ -462,9 +470,11 @@ public class ScheduleActivity extends Activity {
                     cdd.setOnDismissListener(new DialogInterface.OnDismissListener() {
                         @Override
                         public void onDismiss(DialogInterface dialog) {
-                            initializeCalendar();
+                            Intent i = getIntent();
+                            startActivity(i);
                         }
                     });
+
                     cdd.show();
 
                 }
