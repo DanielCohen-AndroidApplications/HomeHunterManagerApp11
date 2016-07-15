@@ -6,6 +6,7 @@ import android.content.ContentProvider;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -21,6 +22,7 @@ import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -99,6 +101,8 @@ public class CustomDialogClass extends Dialog implements
     CognitoCachingCredentialsProvider credentialsProvider;
     CognitoSyncManager syncClient;
     Timeslot timeslot;
+    CheckBox checkBoxAM, checkBoxPM;
+    String amPm;
     public CustomDialogClass(Activity a, Bundle args) {
         super(a);
         // TODO Auto-generated constructor stub
@@ -113,7 +117,8 @@ public class CustomDialogClass extends Dialog implements
         requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         setContentView(R.layout.custom_dialog);
-
+        checkBoxPM=(CheckBox) findViewById(R.id.checkBoxPM);
+        checkBoxAM=(CheckBox) findViewById(R.id.checkBoxAM);
         txt_dia=(TextView)findViewById(R.id.txt_dia);
         txt_dia.setText(date.split(" ")[0].toString()+" "+date.split(" ")[1].toString()+" "+date.split(" ")[2].toString()+"\n"+address);
         yes = (Button) findViewById(R.id.btn_yes);
@@ -134,7 +139,7 @@ public class CustomDialogClass extends Dialog implements
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                hours="00";
+
             }
         });
         spinnerMinutes = (Spinner) findViewById(R.id.spinnerMinutes);
@@ -152,7 +157,7 @@ public class CustomDialogClass extends Dialog implements
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                mins="00";
+
             }
         });
         FacebookSdk.sdkInitialize(getContext());
@@ -383,6 +388,12 @@ public class CustomDialogClass extends Dialog implements
         switch (v.getId()) {
             case R.id.btn_yes:
                 Log.v("_dandia",address+"hours="+hours+"mins="+mins);
+
+                if(checkBoxPM.isChecked()){
+                    amPm=" PM ";
+                }else{
+                    amPm=" AM ";
+                }
                 new dynamoTask().execute();
 
         }
@@ -401,7 +412,7 @@ public class CustomDialogClass extends Dialog implements
             mapper = new DynamoDBMapper(ddbClient);
             timeslot=new Timeslot();
             try {
-                timeslot.setTime(date.split(" ")[0].toString()+" "+date.split(" ")[1].toString()+" "+date.split(" ")[2].toString()+" "+hours+":"+mins+":00 "+date.split(" ")[5].toString()+" @ "+address);
+                timeslot.setTime(date.split(" ")[0].toString()+" "+date.split(" ")[1].toString()+" "+date.split(" ")[2].toString()+" "+hours+":"+mins+amPm+date.split(" ")[5].toString()+" @ "+address);
                 timeslot.setHost(Profile.getCurrentProfile().getName());
                 mapper.save(timeslot);
             }catch (Exception e){

@@ -1,6 +1,7 @@
 package com.hhalpha.daniel.homehuntermanagerapp11;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -324,12 +325,6 @@ public class ScheduleActivity extends Activity {
         new dynamoTask().execute();
         dates=new ArrayList<>();
 
-//        try {
-//            dates.add(new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").parse("20-07-2016 11:30:00"));
-//            Log.v("_dan dates",new SimpleDateFormat("dd-MM-yyyy").parse("10-07-2016").toString());
-//        }catch (Exception e){
-//            e.printStackTrace();
-//        }
         try{
             Bundle bundle = getIntent().getBundleExtra("bundle");
             string=bundle.getString("string");
@@ -337,88 +332,21 @@ public class ScheduleActivity extends Activity {
         }catch(Exception e){
             e.printStackTrace();
         }
-        try {
-            list=new ArrayList<>();
-            list.add(new DaysDecorator());
+        initializeCalendar();
 
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        try{
-            //Initialize CustomCalendarView from layout
-            calendarView = (CustomCalendarView) findViewById(R.id.calendar_view);
-
-//Initialize calendar with date
-            currentCalendar = Calendar.getInstance(Locale.getDefault());
-
-            calendarView.setDecorators(list);
-
-//Show/hide overflow days of a month
-            calendarView.setShowOverflowDate(false);
-
-//call refreshCalendar to update calendar the view
-            calendarView.refreshCalendar(currentCalendar);
-
-//Handling custom calendar events
-            calendarView.setCalendarListener(new CalendarListener() {
-                @Override
-                public void onDateSelected(Date date) {
-                    Bundle bundle = new Bundle();
-                    bundle.putString("address",string.replace("[","").replace("+",""));
-                    bundle.putString("date",date.toString());
-                    SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
-                    Toast.makeText(ScheduleActivity.this, df.format(date), Toast.LENGTH_SHORT).show();
-                    CustomDialogClass cdd=new CustomDialogClass(ScheduleActivity.this, bundle);
-//                    cdd.setTitle(string.replace("[","").replace("+",""));
-
-                    cdd.show();
-
-                }
-
-                @Override
-                public void onMonthChanged(Date date) {
-                    SimpleDateFormat df = new SimpleDateFormat("MM-yyyy");
-                    Toast.makeText(ScheduleActivity.this, df.format(date), Toast.LENGTH_SHORT).show();
-                }
-            });
-
-        }catch (Exception e){
-            e.printStackTrace();
-        }
         new retrieveTask().execute();
     }
     public class DaysDecorator implements DayDecorator {
         @Override
         public void decorate(DayView dayView) {
 
-//            try {
-//                parsedDate = dayView.getDate();
-//                Log.v("_dan parsedDate",parsedDate.toString());
-//            }catch(Exception e){
-//                e.printStackTrace();
-//            }
-//            try {
-            try {
-                Log.v("_dan datedeco", dates.toString().split(" ")[0] + dates.toString().split(" ")[1] + dates.toString().split(" ")[2]);
-                Log.v("_dan datedeco2", dayView.getDate().toString().split(" ")[0]+dayView.getDate().toString().split(" ")[1]+dayView.getDate().toString().split(" ")[2]);
-            }catch (Exception e){
-                e.printStackTrace();
-            }
             for(int i = 0; i<dates.size();i++) {
                 if (dates.get(i).toString().replace("[","").replace("]","").contains(dayView.getDate().toString().split(" ")[0] + " " + dayView.getDate().toString().split(" ")[1] + " " + dayView.getDate().toString().split(" ")[2])) {
-//                    try {
-//                        int index = dates.indexOf(dayView.getDate());
-//                        Log.v("_dan ind", index + "");
-////                        Log.v("_dan dat ind", dates.get(dates.indexOf(dayView.getDate())).toString());
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                    }
+
                     dayView.setBackgroundColor(Color.parseColor("#FFa7a7"));
-                    dayView.setText(dayView.getText().toString()+"\n"+dates.get(i).toString().split(" ")[3]);
+                    dayView.setText(dayView.getText().toString()+"\n"+dates.get(i));
                 }
-//            }catch (Exception e){
-//                e.printStackTrace();
-//            }
+
             }
             if(isPastDay(dayView.getDate())){
                 dayView.setBackgroundColor(Color.parseColor("#a7a7FF"));
@@ -455,13 +383,7 @@ public class ScheduleActivity extends Activity {
             AmazonDynamoDBClient ddbClient = new AmazonDynamoDBClient(credentialsProvider);
             mapper = new DynamoDBMapper(ddbClient);
             timeslot=new Timeslot();
-//            try {
-//                timeslot.setTime("test");
-//                timeslot.setHost("test");
-//                mapper.save(timeslot);
-//            }catch (Exception e){
-//                e.printStackTrace();
-//            }
+
             return null;
         }
     }
@@ -482,7 +404,7 @@ public class ScheduleActivity extends Activity {
             PaginatedScanList<Timeslot> result = mapper.scan(Timeslot.class, scanExpression);
             for(int i=0;i<result.size();i++) {
                 try{
-                    dates.add(new SimpleDateFormat("EEE MMM dd HH:mm:ss yyyy").parse(result.get(i).getTime().toString().split("@")[0].toString()));
+                    dates.add(new SimpleDateFormat("EEE MMM dd hh:mm a yyyy").parse(result.get(i).getTime().toString().split("@")[0].toString()));
                     }catch (Exception e){
                         e.printStackTrace();
                     }
@@ -496,56 +418,65 @@ public class ScheduleActivity extends Activity {
 
         @Override
         protected void onPostExecute(String s) {
-            try {
-                list=new ArrayList<>();
-                list.add(new DaysDecorator());
-
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-            try{
-                //Initialize CustomCalendarView from layout
-                calendarView = (CustomCalendarView) findViewById(R.id.calendar_view);
-
-//Initialize calendar with date
-                currentCalendar = Calendar.getInstance(Locale.getDefault());
-
-                calendarView.setDecorators(list);
-
-//Show/hide overflow days of a month
-                calendarView.setShowOverflowDate(false);
-
-//call refreshCalendar to update calendar the view
-                calendarView.refreshCalendar(currentCalendar);
-
-//Handling custom calendar events
-                calendarView.setCalendarListener(new CalendarListener() {
-                    @Override
-                    public void onDateSelected(Date date) {
-                        Bundle bundle = new Bundle();
-                        bundle.putString("address",string.replace("[","").replace("+",""));
-                        bundle.putString("date",date.toString());
-                        SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
-                        Toast.makeText(ScheduleActivity.this, df.format(date), Toast.LENGTH_SHORT).show();
-                        CustomDialogClass cdd=new CustomDialogClass(ScheduleActivity.this, bundle);
-//                    cdd.setTitle(string.replace("[","").replace("+",""));
-
-                        cdd.show();
-
-                    }
-
-                    @Override
-                    public void onMonthChanged(Date date) {
-                        SimpleDateFormat df = new SimpleDateFormat("MM-yyyy");
-                        Toast.makeText(ScheduleActivity.this, df.format(date), Toast.LENGTH_SHORT).show();
-                    }
-                });
-
-            }catch (Exception e){
-                e.printStackTrace();
-            }
+            initializeCalendar();
         }
 
 
     }
+    public void initializeCalendar(){
+        try {
+            list=new ArrayList<>();
+            list.add(new DaysDecorator());
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        try{
+            //Initialize CustomCalendarView from layout
+            calendarView = (CustomCalendarView) findViewById(R.id.calendar_view);
+
+//Initialize calendar with date
+            currentCalendar = Calendar.getInstance(Locale.getDefault());
+
+            calendarView.setDecorators(list);
+
+//Show/hide overflow days of a month
+            calendarView.setShowOverflowDate(false);
+
+//call refreshCalendar to update calendar the view
+            calendarView.refreshCalendar(currentCalendar);
+
+//Handling custom calendar events
+            calendarView.setCalendarListener(new CalendarListener() {
+                @Override
+                public void onDateSelected(Date date) {
+                    Bundle bundle = new Bundle();
+                    bundle.putString("address",string.replace("[","").replace("+",""));
+                    bundle.putString("date",date.toString());
+                    SimpleDateFormat df = new SimpleDateFormat("EEE MMM dd hh:mm a yyyy");
+                    Toast.makeText(ScheduleActivity.this, df.format(date), Toast.LENGTH_SHORT).show();
+                    CustomDialogClass cdd=new CustomDialogClass(ScheduleActivity.this, bundle);
+//                    cdd.setTitle(string.replace("[","").replace("+",""));
+                    cdd.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                        @Override
+                        public void onDismiss(DialogInterface dialog) {
+                            initializeCalendar();
+                        }
+                    });
+                    cdd.show();
+
+                }
+
+                @Override
+                public void onMonthChanged(Date date) {
+                    SimpleDateFormat df = new SimpleDateFormat("MM-yyyy");
+                    Toast.makeText(ScheduleActivity.this, df.format(date), Toast.LENGTH_SHORT).show();
+                }
+            });
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
 }
