@@ -5,7 +5,7 @@ package com.hhalpha.daniel.homehuntermanagerapp11;
  */
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.*;
 
-@DynamoDBTable(tableName = "Timeslots")
+@DynamoDBTable(tableName = "Timeslot")
 public class Timeslot{
 
     private String time;
