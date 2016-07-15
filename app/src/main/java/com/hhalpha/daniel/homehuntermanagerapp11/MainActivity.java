@@ -42,6 +42,8 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.amazonaws.util.IOUtils;
+import com.facebook.AccessToken;
+import com.facebook.FacebookSdk;
 import com.imanoweb.calendarview.CalendarListener;
 import com.imanoweb.calendarview.CustomCalendarView;
 
@@ -55,7 +57,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * Created by Daniel on 5/30/2016.
@@ -86,6 +90,7 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        FacebookSdk.sdkInitialize(getApplicationContext());
         try {
             Log.v("_danoncreate",getApplicationContext().getCacheDir().listFiles().toString());
             propertyListEntries = new ArrayList<PropertyListEntry>();
@@ -171,9 +176,12 @@ public class MainActivity extends Activity {
 
             credentialsProvider = new CognitoCachingCredentialsProvider(
                     getApplicationContext(),
-                    "us-east-1:ceae0626-1082-4759-85c3-fae01752889a", // Identity Pool ID
+                    "us-east-1:db3a6e00-7c35-4f48-b956-eaf3375a024f", // Identity Pool ID
                     Regions.US_EAST_1 // Region
             );
+            Map<String, String> logins = new HashMap<String, String>();
+            logins.put("graph.facebook.com", AccessToken.getCurrentAccessToken().getToken());
+            credentialsProvider.setLogins(logins);
             syncClient = new CognitoSyncManager(
                     getApplicationContext(),
                     Regions.US_EAST_1, // Region
@@ -260,7 +268,7 @@ public class MainActivity extends Activity {
         @Override
         protected void onPostExecute(ArrayList<String> strings) {
             try {
-                textViewTest.setText(strings.toString());
+                textViewTest.setText("");
                 adapter.notifyDataSetChanged();
             }catch(Exception e){
                 Log.v("_dan post ex",e.getMessage());
