@@ -404,7 +404,9 @@ public class ScheduleActivity extends Activity {
             PaginatedScanList<Timeslot> result = mapper.scan(Timeslot.class, scanExpression);
             for(int i=0;i<result.size();i++) {
                 try{
-                    dates.add(new SimpleDateFormat("EEE MMM dd hh:mm a yyyy").parse(result.get(i).getTime().toString().split("@")[0].toString()));
+                    if(result.get(i).getTime().toString().split("@")[1].toString().contains(string.replace("[","").replace("]","").replace("+","").replace(",",""))) {
+                        dates.add(new SimpleDateFormat("EEE MMM dd hh:mm a yyyy").parse(result.get(i).getTime().toString().split("@")[0].toString()));
+                    }
                     }catch (Exception e){
                         e.printStackTrace();
                     }
