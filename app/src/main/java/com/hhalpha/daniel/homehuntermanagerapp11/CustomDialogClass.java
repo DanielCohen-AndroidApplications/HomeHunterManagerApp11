@@ -73,6 +73,7 @@ import com.amazonaws.services.dynamodbv2.model.UpdateTableResult;
 import com.amazonaws.services.dynamodbv2.model.WriteRequest;
 import com.facebook.AccessToken;
 import com.facebook.FacebookSdk;
+import com.facebook.Profile;
 
 import java.util.Calendar;
 import java.util.HashMap;
@@ -89,7 +90,7 @@ public class CustomDialogClass extends Dialog implements
 
     public Button yes;
     TextView txt_dia;
-
+    AmazonDynamoDBClient ddbClient;
     Spinner spinnerHours, spinnerMinutes;
     String hours, mins, date, address;
     DynamoDBMapper mapper;
@@ -114,7 +115,7 @@ public class CustomDialogClass extends Dialog implements
         setContentView(R.layout.custom_dialog);
 
         txt_dia=(TextView)findViewById(R.id.txt_dia);
-        txt_dia.setText(date+"\n"+address);
+        txt_dia.setText(date.split(" ")[0].toString()+" "+date.split(" ")[1].toString()+" "+date.split(" ")[2].toString()+"\n"+address);
         yes = (Button) findViewById(R.id.btn_yes);
 
         yes.setOnClickListener(this);
@@ -373,7 +374,8 @@ public class CustomDialogClass extends Dialog implements
                 return null;
             }
         };
-        new dynamoTask().execute();
+//        new dynamoTask().execute();
+        new retrieveTask().execute();
     }
 
     @Override
@@ -381,8 +383,8 @@ public class CustomDialogClass extends Dialog implements
         switch (v.getId()) {
             case R.id.btn_yes:
                 Log.v("_dandia",address+"hours="+hours+"mins="+mins);
+                new dynamoTask().execute();
 
-                dismiss();
         }
 
     }
@@ -395,18 +397,47 @@ public class CustomDialogClass extends Dialog implements
                     Regions.US_EAST_1, // Region
                     credentialsProvider);
             credentialsProvider.refresh();
-            AmazonDynamoDBClient ddbClient = new AmazonDynamoDBClient(credentialsProvider);
+            ddbClient = new AmazonDynamoDBClient(credentialsProvider);
             mapper = new DynamoDBMapper(ddbClient);
             timeslot=new Timeslot();
             try {
-                timeslot.setTime("test2");
-                timeslot.setHost("test2");
+                timeslot.setTime(date.split(" ")[0].toString()+" "+date.split(" ")[1].toString()+" "+date.split(" ")[2].toString()+" "+hours+":"+mins+":00 "+date.split(" ")[5].toString()+" @ "+address);
+                timeslot.setHost(Profile.getCurrentProfile().getName());
                 mapper.save(timeslot);
             }catch (Exception e){
                 e.printStackTrace();
             }
             return null;
         }
+
+        @Override
+        protected void onPostExecute(String s) {
+            dismiss();
+        }
+
+    }
+
+    public class retrieveTask extends AsyncTask<String, Integer, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            syncClient = new CognitoSyncManager(
+                    getContext(),
+                    Regions.US_EAST_1, // Region
+                    credentialsProvider);
+            credentialsProvider.refresh();
+            ddbClient = new AmazonDynamoDBClient(credentialsProvider);
+            mapper = new DynamoDBMapper(ddbClient);
+
+            try {
+                Log.v("_dan ddbclient",ddbClient.listTables().toString());
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+
     }
 
 }
