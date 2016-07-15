@@ -375,7 +375,7 @@ public class CustomDialogClass extends Dialog implements
             }
         };
 //        new dynamoTask().execute();
-        new retrieveTask().execute();
+//        new retrieveTask().execute();
     }
 
     @Override
@@ -417,27 +417,6 @@ public class CustomDialogClass extends Dialog implements
 
     }
 
-    public class retrieveTask extends AsyncTask<String, Integer, String> {
 
-        @Override
-        protected String doInBackground(String... params) {
-            syncClient = new CognitoSyncManager(
-                    getContext(),
-                    Regions.US_EAST_1, // Region
-                    credentialsProvider);
-            credentialsProvider.refresh();
-            ddbClient = new AmazonDynamoDBClient(credentialsProvider);
-            mapper = new DynamoDBMapper(ddbClient);
-
-            try {
-                Log.v("_dan ddbclient",ddbClient.listTables().toString());
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-
-    }
 
 }

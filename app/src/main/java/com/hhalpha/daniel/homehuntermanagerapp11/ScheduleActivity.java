@@ -20,6 +20,8 @@ import com.amazonaws.ResponseMetadata;
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
 import com.amazonaws.mobileconnectors.cognito.CognitoSyncManager;
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBMapper;
+import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBScanExpression;
+import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.PaginatedScanList;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
@@ -65,6 +67,8 @@ import com.facebook.FacebookSdk;
 import com.imanoweb.calendarview.CalendarListener;
 import com.imanoweb.calendarview.CustomCalendarView;
 import com.imanoweb.calendarview.*;
+
+import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -87,11 +91,12 @@ public class ScheduleActivity extends Activity {
     Date parsedDate;
     SharedPreferences prefs;
     DynamoDBMapper mapper;
-    AmazonDynamoDB dynamoDB;
     String idPool;
     CognitoCachingCredentialsProvider credentialsProvider;
     CognitoSyncManager syncClient;
     Timeslot timeslot;
+    AmazonDynamoDB dynamoDB;
+    AmazonDynamoDBClient ddbClient;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -319,12 +324,12 @@ public class ScheduleActivity extends Activity {
         new dynamoTask().execute();
         dates=new ArrayList<>();
 
-        try {
-            dates.add(new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").parse("20-07-2016 11:30:00"));
-            Log.v("_dan dates",new SimpleDateFormat("dd-MM-yyyy").parse("10-07-2016").toString());
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+//        try {
+//            dates.add(new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").parse("20-07-2016 11:30:00"));
+//            Log.v("_dan dates",new SimpleDateFormat("dd-MM-yyyy").parse("10-07-2016").toString());
+//        }catch (Exception e){
+//            e.printStackTrace();
+//        }
         try{
             Bundle bundle = getIntent().getBundleExtra("bundle");
             string=bundle.getString("string");
@@ -380,9 +385,9 @@ public class ScheduleActivity extends Activity {
         }catch (Exception e){
             e.printStackTrace();
         }
-
+        new retrieveTask().execute();
     }
-    private class DaysDecorator implements DayDecorator {
+    public class DaysDecorator implements DayDecorator {
         @Override
         public void decorate(DayView dayView) {
 
@@ -400,14 +405,14 @@ public class ScheduleActivity extends Activity {
                 e.printStackTrace();
             }
             for(int i = 0; i<dates.size();i++) {
-                if (dates.toString().contains(dayView.getDate().toString().split(" ")[0] + " " + dayView.getDate().toString().split(" ")[1] + " " + dayView.getDate().toString().split(" ")[2])) {
-                    try {
-                        int index = dates.indexOf(dayView.getDate());
-                        Log.v("_dan ind", index + "");
-//                        Log.v("_dan dat ind", dates.get(dates.indexOf(dayView.getDate())).toString());
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                if (dates.get(i).toString().replace("[","").replace("]","").contains(dayView.getDate().toString().split(" ")[0] + " " + dayView.getDate().toString().split(" ")[1] + " " + dayView.getDate().toString().split(" ")[2])) {
+//                    try {
+//                        int index = dates.indexOf(dayView.getDate());
+//                        Log.v("_dan ind", index + "");
+////                        Log.v("_dan dat ind", dates.get(dates.indexOf(dayView.getDate())).toString());
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
                     dayView.setBackgroundColor(Color.parseColor("#FFa7a7"));
                     dayView.setText(dayView.getText().toString()+"\n"+dates.get(i).toString().split(" ")[3]);
                 }
@@ -450,14 +455,97 @@ public class ScheduleActivity extends Activity {
             AmazonDynamoDBClient ddbClient = new AmazonDynamoDBClient(credentialsProvider);
             mapper = new DynamoDBMapper(ddbClient);
             timeslot=new Timeslot();
+//            try {
+//                timeslot.setTime("test");
+//                timeslot.setHost("test");
+//                mapper.save(timeslot);
+//            }catch (Exception e){
+//                e.printStackTrace();
+//            }
+            return null;
+        }
+    }
+    public class retrieveTask extends AsyncTask<String, Integer, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            syncClient = new CognitoSyncManager(
+                    getApplicationContext(),
+                    Regions.US_EAST_1, // Region
+                    credentialsProvider);
+            credentialsProvider.refresh();
+            ddbClient = new AmazonDynamoDBClient(credentialsProvider);
+            mapper = new DynamoDBMapper(ddbClient);
+
+
+            DynamoDBScanExpression scanExpression = new DynamoDBScanExpression();
+            PaginatedScanList<Timeslot> result = mapper.scan(Timeslot.class, scanExpression);
+            for(int i=0;i<result.size();i++) {
+                try{
+                    dates.add(new SimpleDateFormat("EEE MMM dd HH:mm:ss yyyy").parse(result.get(i).getTime().toString().split("@")[0].toString()));
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                    Log.v("_dan ddbScan", result.get(i).getTime().toString());
+
+                }
+                Log.v("_dan dates after scan", dates.toString());
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
             try {
-                timeslot.setTime("test");
-                timeslot.setHost("test");
-                mapper.save(timeslot);
+                list=new ArrayList<>();
+                list.add(new DaysDecorator());
+
             }catch (Exception e){
                 e.printStackTrace();
             }
-            return null;
+            try{
+                //Initialize CustomCalendarView from layout
+                calendarView = (CustomCalendarView) findViewById(R.id.calendar_view);
+
+//Initialize calendar with date
+                currentCalendar = Calendar.getInstance(Locale.getDefault());
+
+                calendarView.setDecorators(list);
+
+//Show/hide overflow days of a month
+                calendarView.setShowOverflowDate(false);
+
+//call refreshCalendar to update calendar the view
+                calendarView.refreshCalendar(currentCalendar);
+
+//Handling custom calendar events
+                calendarView.setCalendarListener(new CalendarListener() {
+                    @Override
+                    public void onDateSelected(Date date) {
+                        Bundle bundle = new Bundle();
+                        bundle.putString("address",string.replace("[","").replace("+",""));
+                        bundle.putString("date",date.toString());
+                        SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
+                        Toast.makeText(ScheduleActivity.this, df.format(date), Toast.LENGTH_SHORT).show();
+                        CustomDialogClass cdd=new CustomDialogClass(ScheduleActivity.this, bundle);
+//                    cdd.setTitle(string.replace("[","").replace("+",""));
+
+                        cdd.show();
+
+                    }
+
+                    @Override
+                    public void onMonthChanged(Date date) {
+                        SimpleDateFormat df = new SimpleDateFormat("MM-yyyy");
+                        Toast.makeText(ScheduleActivity.this, df.format(date), Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }
+
+
     }
 }
