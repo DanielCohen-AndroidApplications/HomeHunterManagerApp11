@@ -89,6 +89,7 @@ public class ScheduleActivity extends Activity {
     Calendar currentCalendar;
     List<DayDecorator> list;
     ArrayList<Date> dates, appts, confAppts;
+    ArrayList<ArrayList<Date>> dateArrayLists;
     DynamoDBMapper mapper;
     CognitoCachingCredentialsProvider credentialsProvider;
     CognitoSyncManager syncClient;
@@ -98,10 +99,18 @@ public class ScheduleActivity extends Activity {
     ArrayList<Integer> apptIndicies;
     int apptIndex, numSlots, numAppts, numConfAppts;
     String status;
+    ArrayList<String> dateArrayList, apptArrayList, confApptArrayList;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_schedule);
+        dates=new ArrayList<>();
+        appts=new ArrayList<>();
+        confAppts=new ArrayList<>();
+        apptIndicies=new ArrayList<>();
+        dateArrayList = new ArrayList<>();
+        dateArrayLists=new ArrayList<>();
+        apptArrayList=new ArrayList<>();
         //Initialize CustomCalendarView from layout
         calendarView = (CustomCalendarView) findViewById(R.id.calendar_view);
         FacebookSdk.sdkInitialize(getApplicationContext());
@@ -324,10 +333,7 @@ public class ScheduleActivity extends Activity {
             }
         };
         new dynamoTask().execute();
-        dates=new ArrayList<>();
-        appts=new ArrayList<>();
-        confAppts=new ArrayList<>();
-        apptIndicies=new ArrayList<>();
+
         try{
             Bundle bundle = getIntent().getBundleExtra("bundle");
             string=bundle.getString("string");
@@ -368,27 +374,26 @@ public class ScheduleActivity extends Activity {
                         dayView.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                            try {
+                                try{
+                                    for(int x=0;x<appts.toString().split(",").length;x++){
+                                        dateArrayList.add(dates.toString().split(",")[x]);
+                                        apptArrayList.add(appts.toString().split(",")[x]);
+                                        confApptArrayList.add(confAppts.toString().split(",")[x]);
+                                    }}catch (Exception e){
+                                    e.printStackTrace();
+                                }
+                                try {
                                 Bundle bundle = new Bundle();
                                 bundle.putString("address", string.replace("[", "").replace("+", ""));
                                 bundle.putString("date", dates.get(apptIndex).toString());//
                                 bundle.putString("status","available");
-
+                                bundle.putString("dates",dates.toString());
+                                bundle.putString("appts",appts.toString());
+                                bundle.putString("confAppts",confAppts.toString());
+                                bundle.putStringArrayList("dateArrayList",dateArrayList);
+                                bundle.putStringArrayList("apptArrayList",apptArrayList);
+                                bundle.putStringArrayList("confApptArrayList",confApptArrayList);
                                 CustomListDialog cdd = new CustomListDialog(ScheduleActivity.this, bundle);
-//                    cdd.setTitle(string.replace("[","").replace("+",""));
-//                                cdd.setOnDismissListener(new DialogInterface.OnDismissListener() {
-//                                    @Override
-//                                    public void onDismiss(DialogInterface dialog) {
-//                                        dayView.setBackgroundColor(Color.parseColor("#a7a7a7"));
-//                                        dayView.setText("Awaiting confirmation for " + dayView.getText().toString());
-//                                        SimpleDateFormat df = new SimpleDateFormat("EEE MMM dd hh:mm a yyyy", Locale.US);
-//                                        Toast.makeText(ScheduleActivity.this, df.format(dayView.getDate()), Toast.LENGTH_SHORT).show();
-//
-//                                        Intent i = getIntent();
-//                                        startActivity(i);
-//                                    }
-//                                });
-
                                 cdd.show();
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -409,26 +414,23 @@ public class ScheduleActivity extends Activity {
                         dayView.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
+                                try{
+                                    for(int x=0;x<appts.toString().split(",").length;x++){
+                                        dateArrayList.add(dates.toString().split(",")[x]);
+                                        apptArrayList.add(appts.toString().split(",")[x]);
+                                        confApptArrayList.add(confAppts.toString().split(",")[x]);
+                                    }}catch (Exception e){
+                                    e.printStackTrace();
+                                }
                                 try {
                                     Bundle bundle = new Bundle();
                                     bundle.putString("address", string.replace("[", "").replace("+", ""));
                                     bundle.putString("date", dates.get(apptIndex).toString());//
                                     bundle.putString("status", "requested");
+                                    bundle.putString("dates",dates.toString());
+                                    bundle.putString("appts",appts.toString());
+                                    bundle.putString("confAppts",confAppts.toString());
                                     CustomListDialog cdd = new CustomListDialog(ScheduleActivity.this, bundle);
-//                    cdd.setTitle(string.replace("[","").replace("+",""));
-//                                    cdd.setOnDismissListener(new DialogInterface.OnDismissListener() {
-//                                        @Override
-//                                        public void onDismiss(DialogInterface dialog) {
-//                                            dayView.setBackgroundColor(Color.parseColor("#a7a7a7"));
-//                                            dayView.setText("Awaiting confirmation for "+dayView.getText().toString());
-//                                            SimpleDateFormat df = new SimpleDateFormat("EEE MMM dd hh:mm a yyyy", Locale.US);
-//                                            Toast.makeText(ScheduleActivity.this, df.format(dayView.getDate()), Toast.LENGTH_SHORT).show();
-//
-//                                            Intent i = getIntent();
-//                                            startActivity(i);
-//                                        }
-//                                    });
-
                                     cdd.show();
                                 } catch (Exception e) {
                                     e.printStackTrace();
@@ -451,25 +453,24 @@ public class ScheduleActivity extends Activity {
                         dayView.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
+                                try{
+                                for(int x=0;x<appts.toString().split(",").length;x++){
+                                    dateArrayList.add(dates.toString().split(",")[x]);
+                                    apptArrayList.add(appts.toString().split(",")[x]);
+                                    confApptArrayList.add(confAppts.toString().split(",")[x]);
+                                }}catch (Exception e){
+                                    e.printStackTrace();
+                                }
                                 try {
                                     Bundle bundle = new Bundle();
                                     bundle.putString("address", string.replace("[", "").replace("+", ""));
                                     bundle.putString("date", dates.get(apptIndex).toString());//
                                     bundle.putString("status","requested");
+                                    bundle.putString("dates",dates.toString());
+                                    bundle.putString("appts",appts.toString());
+                                    bundle.putString("confAppts",confAppts.toString());
                                     CustomListDialog cdd = new CustomListDialog(ScheduleActivity.this, bundle);
-//                    cdd.setTitle(string.replace("[","").replace("+",""));
-//                                    cdd.setOnDismissListener(new DialogInterface.OnDismissListener() {
-//                                        @Override
-//                                        public void onDismiss(DialogInterface dialog) {
-//                                            dayView.setBackgroundColor(Color.parseColor("#a7a7a7"));
-//                                            dayView.setText("Awaiting confirmation for "+dayView.getText().toString());
-//                                            SimpleDateFormat df = new SimpleDateFormat("EEE MMM dd hh:mm a yyyy", Locale.US);
-//                                            Toast.makeText(ScheduleActivity.this, df.format(dayView.getDate()), Toast.LENGTH_SHORT).show();
-//
-//                                            Intent i = getIntent();
-//                                            startActivity(i);
-//                                        }
-//                                    });
+
 
                                     cdd.show();
                                 }catch(Exception e){
@@ -552,10 +553,6 @@ public class ScheduleActivity extends Activity {
             return null;
         }
 
-//        @Override
-//        protected void onPostExecute(String s) {
-//            initializeCalendar();
-//        }
 
 
     }

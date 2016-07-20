@@ -82,7 +82,7 @@ public class CustomListDialog extends Dialog implements
     public Activity c;
 
     public Button yes;
-    TextView txt_dia;
+    TextView txt_dia, txt_dia2, txt_dia3;
     AmazonDynamoDBClient ddbClient;
     Spinner spinnerHours, spinnerMinutes;
     String hours, mins, date, address, status;
@@ -96,10 +96,11 @@ public class CustomListDialog extends Dialog implements
     ConfirmedAppointment confAppt;
     CheckBox checkBoxAM, checkBoxPM;
     String amPm;
-    ListView list;
-    ArrayList<String> test;
-    CustomListViewAdapter2 adapter;
-
+    ListView list, list2, list3;
+    String dates,appts,confAppts;
+    ArrayList<String> allDates,dateArrayList, apptArrayList, confApptArrayList;
+    CustomListViewAdapter2 adapter, adapter2, adapter3;
+    int numDates, numAppts, numConfAppts;
     public CustomListDialog(Activity a, Bundle args) {
         super(a);
         // TODO Auto-generated constructor stub
@@ -107,38 +108,83 @@ public class CustomListDialog extends Dialog implements
         address=args.getString("address");
         date=args.getString("date");
         status=args.getString("status");
+        dates=args.getString("dates");
+        appts=args.getString("appts");
+        confAppts=args.getString("confAppts");
+        dateArrayList=args.getStringArrayList("dateArrayList");
+        apptArrayList=args.getStringArrayList("apptArrayList");
+        confApptArrayList=args.getStringArrayList("confApptArrayList");
+        Log.v("_dan list dialog info",dates+appts+confAppts);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        test=new ArrayList<>();
-        test.add("1");
-        test.add("2");
-        test.add("3");
+
 
         setContentView(R.layout.custom_dialog3);
 
         txt_dia=(TextView)findViewById(R.id.txt_dia);
-        txt_dia.setText(date.split(" ")[0].toString()+" "+date.split(" ")[1].toString()+"\n"+date.split(" ")[2].toString()+address+status);
+        txt_dia2=(TextView)findViewById(R.id.txt_dia2);
+        txt_dia3=(TextView)findViewById(R.id.txt_dia3);
 
         yes = (Button) findViewById(R.id.btn_yes);
         yes.setOnClickListener(this);
 
-        list=(ListView) findViewById(R.id.list);
-        adapter = new CustomListViewAdapter2(getContext(), R.layout.list_layout2, test);
+        try {
+            list = (ListView) findViewById(R.id.list);
+            adapter = new CustomListViewAdapter2(getOwnerActivity().getBaseContext(), R.layout.list_layout2, this.dateArrayList);
 
-        list.setAdapter(adapter);
+            list.setAdapter(adapter);
 
-        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-            }
+                }
 
-        });
-        adapter.notifyDataSetChanged();
+            });
+            adapter.notifyDataSetChanged();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        try {
+            list2 = (ListView) findViewById(R.id.list2);
+            adapter2 = new CustomListViewAdapter2(getOwnerActivity().getBaseContext(), R.layout.list_layout2, apptArrayList);
+
+            list2.setAdapter(adapter2);
+
+            list2.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                }
+
+            });
+            adapter2.notifyDataSetChanged();
+        }catch (Exception e){
+        e.printStackTrace();
+        }
+
+        try {
+            list3 = (ListView) findViewById(R.id.list3);
+            adapter3 = new CustomListViewAdapter2(getOwnerActivity().getBaseContext(), R.layout.list_layout2, confApptArrayList);
+
+            list3.setAdapter(adapter3);
+
+            list3.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                }
+
+            });
+            adapter3.notifyDataSetChanged();
+        }catch (Exception e){
+        e.printStackTrace();
+        }
         FacebookSdk.sdkInitialize(getContext());
         try{
             credentialsProvider = new CognitoCachingCredentialsProvider(
@@ -366,10 +412,10 @@ public class CustomListDialog extends Dialog implements
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_yes:
-                Log.v("_dandia",address+"hours="+hours+"mins="+mins);
-
-
-                new dynamoTask().execute();
+//                Log.v("_dandia",address+"hours="+hours+"mins="+mins);
+//
+//
+//                new dynamoTask().execute();
 
         }
 
