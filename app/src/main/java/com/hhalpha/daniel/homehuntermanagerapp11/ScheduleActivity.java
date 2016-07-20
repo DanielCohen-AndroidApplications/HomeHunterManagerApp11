@@ -364,7 +364,7 @@ public class ScheduleActivity extends Activity {
                         status = "available";
                         numSlots++;
                         dayView.setBackgroundColor(Color.parseColor("#cca7a7"));
-                        dayView.setText(numSlots + " Timeslots set as available");
+
                         dayView.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -405,7 +405,7 @@ public class ScheduleActivity extends Activity {
                         status = "requested";
                         numAppts++;
                         dayView.setBackgroundColor(Color.parseColor("#a7a7bb"));
-                        dayView.setText("Awaiting confirmation for " + numAppts + " time slots.");
+
                         dayView.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -447,7 +447,7 @@ public class ScheduleActivity extends Activity {
                     if (confAppts.get(z).toString().replace("[", "").replace("]", "").contains(dayView.getDate().toString().split(" ")[0] + " " + dayView.getDate().toString().split(" ")[1] + " " + dayView.getDate().toString().split(" ")[2])) {
                         numConfAppts++;
                         dayView.setBackgroundColor(Color.parseColor("#00FF00"));
-                        dayView.setText(numConfAppts + " appointments confirmed!");
+
                         dayView.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -479,6 +479,9 @@ public class ScheduleActivity extends Activity {
                         });
                     }
 
+                }
+                if(numSlots>0||numAppts>0||numConfAppts>0) {
+                    dayView.setText(numSlots + " timeslots set as available" + "\n" + numAppts + "time slots awaiting confirmation" + "\n" + numConfAppts + " appointments confirmed!");
                 }
             }
 
