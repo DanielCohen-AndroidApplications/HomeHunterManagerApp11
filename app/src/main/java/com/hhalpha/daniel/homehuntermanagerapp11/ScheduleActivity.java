@@ -368,31 +368,31 @@ public class ScheduleActivity extends Activity {
                         dayView.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-//                            try {
-//                                Bundle bundle = new Bundle();
-//                                bundle.putString("address", string.replace("[", "").replace("+", ""));
-//                                bundle.putString("date", dates.get(apptIndex).toString());//
-//                                bundle.putString("status","available");
+                            try {
+                                Bundle bundle = new Bundle();
+                                bundle.putString("address", string.replace("[", "").replace("+", ""));
+                                bundle.putString("date", dates.get(apptIndex).toString());//
+                                bundle.putString("status","available");
+
+                                CustomListDialog cdd = new CustomListDialog(ScheduleActivity.this, bundle);
+//                    cdd.setTitle(string.replace("[","").replace("+",""));
+//                                cdd.setOnDismissListener(new DialogInterface.OnDismissListener() {
+//                                    @Override
+//                                    public void onDismiss(DialogInterface dialog) {
+//                                        dayView.setBackgroundColor(Color.parseColor("#a7a7a7"));
+//                                        dayView.setText("Awaiting confirmation for " + dayView.getText().toString());
+//                                        SimpleDateFormat df = new SimpleDateFormat("EEE MMM dd hh:mm a yyyy", Locale.US);
+//                                        Toast.makeText(ScheduleActivity.this, df.format(dayView.getDate()), Toast.LENGTH_SHORT).show();
 //
-//                                CustomDialogClass cdd = new CustomDialogClass(ScheduleActivity.this, bundle);
-////                    cdd.setTitle(string.replace("[","").replace("+",""));
-////                                cdd.setOnDismissListener(new DialogInterface.OnDismissListener() {
-////                                    @Override
-////                                    public void onDismiss(DialogInterface dialog) {
-////                                        dayView.setBackgroundColor(Color.parseColor("#a7a7a7"));
-////                                        dayView.setText("Awaiting confirmation for " + dayView.getText().toString());
-////                                        SimpleDateFormat df = new SimpleDateFormat("EEE MMM dd hh:mm a yyyy", Locale.US);
-////                                        Toast.makeText(ScheduleActivity.this, df.format(dayView.getDate()), Toast.LENGTH_SHORT).show();
-////
-////                                        Intent i = getIntent();
-////                                        startActivity(i);
-////                                    }
-////                                });
-//
-//                                cdd.show();
-//                            } catch (Exception e) {
-//                                e.printStackTrace();
-//                            }
+//                                        Intent i = getIntent();
+//                                        startActivity(i);
+//                                    }
+//                                });
+
+                                cdd.show();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                             }
                         });
                     }
@@ -414,7 +414,7 @@ public class ScheduleActivity extends Activity {
                                     bundle.putString("address", string.replace("[", "").replace("+", ""));
                                     bundle.putString("date", dates.get(apptIndex).toString());//
                                     bundle.putString("status", "requested");
-                                    CustomApptsDialogClass cdd = new CustomApptsDialogClass(ScheduleActivity.this, bundle);
+                                    CustomListDialog cdd = new CustomListDialog(ScheduleActivity.this, bundle);
 //                    cdd.setTitle(string.replace("[","").replace("+",""));
 //                                    cdd.setOnDismissListener(new DialogInterface.OnDismissListener() {
 //                                        @Override
@@ -451,37 +451,37 @@ public class ScheduleActivity extends Activity {
                         dayView.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-//                                try {
-//                                    Bundle bundle = new Bundle();
-//                                    bundle.putString("address", string.replace("[", "").replace("+", ""));
-//                                    bundle.putString("date", dates.get(apptIndex).toString());//
-//                                    bundle.putString("status","requested");
-//                                    CustomApptsDialogClass cdd = new CustomApptsDialogClass(ScheduleActivity.this, bundle);
-////                    cdd.setTitle(string.replace("[","").replace("+",""));
-////                                    cdd.setOnDismissListener(new DialogInterface.OnDismissListener() {
-////                                        @Override
-////                                        public void onDismiss(DialogInterface dialog) {
-////                                            dayView.setBackgroundColor(Color.parseColor("#a7a7a7"));
-////                                            dayView.setText("Awaiting confirmation for "+dayView.getText().toString());
-////                                            SimpleDateFormat df = new SimpleDateFormat("EEE MMM dd hh:mm a yyyy", Locale.US);
-////                                            Toast.makeText(ScheduleActivity.this, df.format(dayView.getDate()), Toast.LENGTH_SHORT).show();
-////
-////                                            Intent i = getIntent();
-////                                            startActivity(i);
-////                                        }
-////                                    });
+                                try {
+                                    Bundle bundle = new Bundle();
+                                    bundle.putString("address", string.replace("[", "").replace("+", ""));
+                                    bundle.putString("date", dates.get(apptIndex).toString());//
+                                    bundle.putString("status","requested");
+                                    CustomListDialog cdd = new CustomListDialog(ScheduleActivity.this, bundle);
+//                    cdd.setTitle(string.replace("[","").replace("+",""));
+//                                    cdd.setOnDismissListener(new DialogInterface.OnDismissListener() {
+//                                        @Override
+//                                        public void onDismiss(DialogInterface dialog) {
+//                                            dayView.setBackgroundColor(Color.parseColor("#a7a7a7"));
+//                                            dayView.setText("Awaiting confirmation for "+dayView.getText().toString());
+//                                            SimpleDateFormat df = new SimpleDateFormat("EEE MMM dd hh:mm a yyyy", Locale.US);
+//                                            Toast.makeText(ScheduleActivity.this, df.format(dayView.getDate()), Toast.LENGTH_SHORT).show();
 //
-//                                    cdd.show();
-//                                }catch(Exception e){
-//                                    e.printStackTrace();
-//                                }
+//                                            Intent i = getIntent();
+//                                            startActivity(i);
+//                                        }
+//                                    });
+
+                                    cdd.show();
+                                }catch(Exception e){
+                                    e.printStackTrace();
+                                }
                             }
                         });
                     }
 
                 }
                 if(numSlots>0||numAppts>0||numConfAppts>0) {
-                    dayView.setText(numSlots + " timeslots set as available" + "\n" + numAppts + "time slots awaiting confirmation" + "\n" + numConfAppts + " appointments confirmed!");
+                    dayView.setText(dayView.getDate().toString().split(" ")[2]+"\n"+numSlots + " timeslots set as available" + "\n" + numAppts + " timeslots awaiting confirmation" + "\n" + numConfAppts + " appointments confirmed!");
                 }
             }
 
