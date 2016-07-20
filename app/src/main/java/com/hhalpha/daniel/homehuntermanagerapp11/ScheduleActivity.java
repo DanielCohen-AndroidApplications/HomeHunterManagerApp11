@@ -99,7 +99,7 @@ public class ScheduleActivity extends Activity {
     ArrayList<Integer> apptIndicies;
     int apptIndex, numSlots, numAppts, numConfAppts;
     String status;
-    ArrayList<String> dateArrayList, apptArrayList, confApptArrayList;
+    ArrayList<String> dateArrayList, apptArrayList, confApptArrayList, statusList;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -112,6 +112,7 @@ public class ScheduleActivity extends Activity {
         dateArrayLists=new ArrayList<>();
         apptArrayList=new ArrayList<>();
         confApptArrayList=new ArrayList<>();
+        statusList=new ArrayList<>();
         //Initialize CustomCalendarView from layout
         calendarView = (CustomCalendarView) findViewById(R.id.calendar_view);
         FacebookSdk.sdkInitialize(getApplicationContext());
@@ -368,7 +369,7 @@ public class ScheduleActivity extends Activity {
                 for (int i = 0; i < dates.size(); i++) {
                     apptIndex = i;
                     if (dates.get(i).toString().replace("[", "").replace("]", "").contains(dayView.getDate().toString().split(" ")[0] + " " + dayView.getDate().toString().split(" ")[1] + " " + dayView.getDate().toString().split(" ")[2])) {
-                        status = "available";
+                        statusList.add("available");
                         numSlots++;
                         dayView.setBackgroundColor(Color.parseColor("#cca7a7"));
                     }
@@ -378,14 +379,14 @@ public class ScheduleActivity extends Activity {
                 for (int y = 0; y < appts.size(); y++) {
                     apptIndex = y;
                     if (appts.get(y).toString().replace("[", "").replace("]", "").contains(dayView.getDate().toString().split(" ")[0] + " " + dayView.getDate().toString().split(" ")[1] + " " + dayView.getDate().toString().split(" ")[2])) {
-                        status = "requested";
+                        statusList.add("requested");
                         numAppts++;
                         dayView.setBackgroundColor(Color.parseColor("#a7a7bb"));
                     }
                 }
 
                 for (int z = 0; z < confAppts.size(); z++) {
-                    status = "confirmed";
+                    statusList.add("confirmed");
                     apptIndex = z;
                     Log.v("_dan confAppts" + z, confAppts.get(z).toString());
                     Log.v("dan dayview get date", dayView.getDate().toString());
@@ -423,7 +424,7 @@ public class ScheduleActivity extends Activity {
                                 Bundle bundle = new Bundle();
                                 bundle.putString("date", dayView.getDate().toString());//
                                 if(!string.isEmpty()){bundle.putString("address", string.replace("[", "").replace("+", ""));}
-                                if(!status.isEmpty()){bundle.putString("status",status);}
+                                if(!statusList.isEmpty()){bundle.putStringArrayList("statusList",statusList);}
                                 if(!dateArrayList.isEmpty()){bundle.putStringArrayList("dateArrayList",dateArrayList);}
                                 if(!apptArrayList.isEmpty()){bundle.putStringArrayList("apptArrayList",apptArrayList);}
                                 if(!confApptArrayList.isEmpty()){bundle.putStringArrayList("confApptArrayList",confApptArrayList);}

@@ -98,7 +98,7 @@ public class CustomListDialog extends Dialog implements
     String amPm;
     ListView list, list2, list3;
     String dates,appts,confAppts;
-    ArrayList<String> allDates,dateArrayList, apptArrayList, confApptArrayList;
+    ArrayList<String> allDates,dateArrayList, apptArrayList, confApptArrayList, statusList;
     CustomListViewAdapter2 adapter, adapter2, adapter3;
     int numDates, numAppts, numConfAppts;
     Bundle bundle;
@@ -110,7 +110,11 @@ public class CustomListDialog extends Dialog implements
         try {
             address = bundle.getString("address");
             date = bundle.getString("date");
-            status = bundle.getString("status");
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        try {
+            statusList = bundle.getStringArrayList("statusList");
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -137,29 +141,41 @@ public class CustomListDialog extends Dialog implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-
-
         setContentView(R.layout.custom_dialog3);
-
         txt_dia=(TextView)findViewById(R.id.txt_dia);
         txt_dia2=(TextView)findViewById(R.id.txt_dia2);
         txt_dia3=(TextView)findViewById(R.id.txt_dia3);
+        list = (ListView) findViewById(R.id.list);
+        list2 = (ListView) findViewById(R.id.list2);
+        list3 = (ListView) findViewById(R.id.list3);
+        try{
+            if(!statusList.contains("available")){
+                txt_dia.setVisibility(View.GONE);
+                list.setVisibility(View.GONE);
+            }
+            if(!statusList.contains("requested")){
+                txt_dia2.setVisibility(View.GONE);
+                list2.setVisibility(View.GONE);
+            }
+            if(!statusList.contains("confirmed")){
+                txt_dia3.setVisibility(View.GONE);
+                list3.setVisibility(View.GONE);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
         yes = (Button) findViewById(R.id.btn_yes);
         yes.setOnClickListener(this);
         if(!dateArrayList.isEmpty()) {
             try {
-                list = (ListView) findViewById(R.id.list);
+
                 adapter = new CustomListViewAdapter2(c.getApplicationContext(), R.layout.list_layout2, dateArrayList);
-
                 list.setAdapter(adapter);
-
                 list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
                     }
-
                 });
                 adapter.notifyDataSetChanged();
             } catch (Exception e) {
@@ -168,11 +184,9 @@ public class CustomListDialog extends Dialog implements
         }
         if(!apptArrayList.isEmpty()) {
             try {
-                list2 = (ListView) findViewById(R.id.list2);
+
                 adapter2 = new CustomListViewAdapter2(c.getApplicationContext(), R.layout.list_layout2, apptArrayList);
-
                 list2.setAdapter(adapter2);
-
                 list2.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -187,7 +201,7 @@ public class CustomListDialog extends Dialog implements
         }
         if(!confApptArrayList.isEmpty()) {
             try {
-                list3 = (ListView) findViewById(R.id.list3);
+
                 adapter3 = new CustomListViewAdapter2(c.getApplicationContext(), R.layout.list_layout2, confApptArrayList);
 
                 list3.setAdapter(adapter3);
@@ -204,6 +218,8 @@ public class CustomListDialog extends Dialog implements
                 e.printStackTrace();
             }
         }
+
+
         FacebookSdk.sdkInitialize(getContext());
         try{
             credentialsProvider = new CognitoCachingCredentialsProvider(
@@ -430,8 +446,7 @@ public class CustomListDialog extends Dialog implements
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_yes:
-
-
+                //TODO add intent to activity to add new timeslot
         }
 
     }
