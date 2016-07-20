@@ -101,20 +101,36 @@ public class CustomListDialog extends Dialog implements
     ArrayList<String> allDates,dateArrayList, apptArrayList, confApptArrayList;
     CustomListViewAdapter2 adapter, adapter2, adapter3;
     int numDates, numAppts, numConfAppts;
+    Bundle bundle;
     public CustomListDialog(Activity a, Bundle args) {
         super(a);
         // TODO Auto-generated constructor stub
         this.c = a;
-        address=args.getString("address");
-        date=args.getString("date");
-        status=args.getString("status");
-        dates=args.getString("dates");
-        appts=args.getString("appts");
-        confAppts=args.getString("confAppts");
-        dateArrayList=args.getStringArrayList("dateArrayList");
-        apptArrayList=args.getStringArrayList("apptArrayList");
-        confApptArrayList=args.getStringArrayList("confApptArrayList");
-        Log.v("_dan list dialog info",dates+appts+confAppts);
+        this.bundle=args;
+        try {
+            address = bundle.getString("address");
+            date = bundle.getString("date");
+            status = bundle.getString("status");
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        try {
+            dateArrayList = bundle.getStringArrayList("dateArrayList");
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        try {
+            apptArrayList = bundle.getStringArrayList("apptArrayList");
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        try {
+            confApptArrayList = bundle.getStringArrayList("confApptArrayList");
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        Log.v("_dan list dialog info",dateArrayList.toString()+apptArrayList.toString()+confApptArrayList.toString());
+        Log.v("_dan list dialog info",date+address+status);
     }
 
     @Override
@@ -131,59 +147,62 @@ public class CustomListDialog extends Dialog implements
 
         yes = (Button) findViewById(R.id.btn_yes);
         yes.setOnClickListener(this);
+        if(!dateArrayList.isEmpty()) {
+            try {
+                list = (ListView) findViewById(R.id.list);
+                adapter = new CustomListViewAdapter2(c.getApplicationContext(), R.layout.list_layout2, dateArrayList);
 
-        try {
-            list = (ListView) findViewById(R.id.list);
-            adapter = new CustomListViewAdapter2(getOwnerActivity().getBaseContext(), R.layout.list_layout2, this.dateArrayList);
+                list.setAdapter(adapter);
 
-            list.setAdapter(adapter);
+                list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
-            list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    }
 
-                }
-
-            });
-            adapter.notifyDataSetChanged();
-        }catch (Exception e){
-            e.printStackTrace();
+                });
+                adapter.notifyDataSetChanged();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
+        if(!apptArrayList.isEmpty()) {
+            try {
+                list2 = (ListView) findViewById(R.id.list2);
+                adapter2 = new CustomListViewAdapter2(c.getApplicationContext(), R.layout.list_layout2, apptArrayList);
 
-        try {
-            list2 = (ListView) findViewById(R.id.list2);
-            adapter2 = new CustomListViewAdapter2(getOwnerActivity().getBaseContext(), R.layout.list_layout2, apptArrayList);
+                list2.setAdapter(adapter2);
 
-            list2.setAdapter(adapter2);
+                list2.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
-            list2.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    }
 
-                }
-
-            });
-            adapter2.notifyDataSetChanged();
-        }catch (Exception e){
-        e.printStackTrace();
+                });
+                adapter2.notifyDataSetChanged();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
+        if(!confApptArrayList.isEmpty()) {
+            try {
+                list3 = (ListView) findViewById(R.id.list3);
+                adapter3 = new CustomListViewAdapter2(c.getApplicationContext(), R.layout.list_layout2, confApptArrayList);
 
-        try {
-            list3 = (ListView) findViewById(R.id.list3);
-            adapter3 = new CustomListViewAdapter2(getOwnerActivity().getBaseContext(), R.layout.list_layout2, confApptArrayList);
+                list3.setAdapter(adapter3);
 
-            list3.setAdapter(adapter3);
+                list3.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
-            list3.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    }
 
-                }
-
-            });
-            adapter3.notifyDataSetChanged();
-        }catch (Exception e){
-        e.printStackTrace();
+                });
+                adapter3.notifyDataSetChanged();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         FacebookSdk.sdkInitialize(getContext());
         try{
@@ -404,77 +423,18 @@ public class CustomListDialog extends Dialog implements
                 return null;
             }
         };
-//        new dynamoTask().execute();
-//        new retrieveTask().execute();
+
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_yes:
-//                Log.v("_dandia",address+"hours="+hours+"mins="+mins);
-//
-//
-//                new dynamoTask().execute();
+
 
         }
 
     }
-    public class dynamoTask extends AsyncTask<String, Integer, String> {
-
-        @Override
-        protected String doInBackground(String... params) {
-            syncClient = new CognitoSyncManager(
-                    getContext(),
-                    Regions.US_EAST_1, // Region
-                    credentialsProvider);
-            credentialsProvider.refresh();
-            ddbClient = new AmazonDynamoDBClient(credentialsProvider);
-            mapper = new DynamoDBMapper(ddbClient);
-            confAppt = new ConfirmedAppointment();
-//            try {
-//                appointment.setTime(date+" @ "+address);
-////                appointment.setHost(Profile.getCurrentProfile().getName());
-//
-//            }catch (Exception e){
-//                e.printStackTrace();
-//            }
-            try{
-//                timeslot = mapper.load(Timeslot.class,new SimpleDateFormat("EEE MMM dd hh:mm a yyyy", Locale.US).parse(date)+" @ "+address);
-                DynamoDBScanExpression scanExpression = new DynamoDBScanExpression();
-                PaginatedScanList<Appointment> result = mapper.scan(Appointment.class, scanExpression);
-                for(int i=0;i<result.size();i++) {
-                    if (result.get(i).getTime().split("@")[1].contains(address.replace("[", "").replace("]", "").replace("+", "").replace(",", ""))) {
-                        Log.v("_dan custdialog result",result.get(i).getTime().split("@")[1]);
-                        confAppt.setHost(result.get(i).getHost());
-                        confAppt.setTime(result.get(i).getTime());
-                        appointment=result.get(i);
-                    }
-                }
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-
-            try{
-                mapper.save(confAppt);
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-            try{
-                mapper.delete(appointment);
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            dismiss();
-        }
-
-    }
-
 
 
 }

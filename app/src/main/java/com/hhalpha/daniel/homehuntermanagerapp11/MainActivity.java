@@ -239,7 +239,7 @@ public class MainActivity extends Activity {
                         String key = summary.getKey();
                         S3ObjectInputStream content = s3.getObject("hhproperties", key).getObjectContent();
                         ObjectMetadata metadata = s3.getObject("hhproperties", key).getObjectMetadata();
-                        Log.v("_dan meta",metadata.getUserMetaDataOf("info").toString());
+//                        Log.v("_dan meta",metadata.getUserMetaDataOf("info").toString());
                         metadataArrayList.add(metadata.getUserMetaDataOf("info").toString());
                         metadataArrayList.add(metadata.getUserMetaDataOf("coords").toString());
                         byte[] bytes = IOUtils.toByteArray(content);

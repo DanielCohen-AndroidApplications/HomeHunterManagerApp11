@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="500dp">
+
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
     <TextView
         android:id="@+id/txt_dia"
         android:layout_width="wrap_content"
@@ -16,11 +14,14 @@
         android:textColor="@android:color/black"
         android:textSize="15dp"
         android:textStyle="bold"/>
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical" android:layout_width="match_parent"
+        android:layout_height="50dp">
     <ListView
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
         android:id="@+id/list" />
-
+    </ScrollView>
     <TextView
         android:id="@+id/txt_dia2"
         android:layout_width="wrap_content"
@@ -31,11 +32,14 @@
         android:textColor="@android:color/black"
         android:textSize="15dp"
         android:textStyle="bold"/>
-    <ListView
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:id="@+id/list2"
-        android:layout_gravity="center_horizontal" />
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical" android:layout_width="match_parent"
+        android:layout_height="50dp">
+        <ListView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:id="@+id/list2" />
+    </ScrollView>
 
     <TextView
         android:id="@+id/txt_dia3"
@@ -47,11 +51,14 @@
         android:textColor="@android:color/black"
         android:textSize="15dp"
         android:textStyle="bold"/>
-    <ListView
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:id="@+id/list3"
-        android:layout_gravity="center_horizontal" />
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical" android:layout_width="match_parent"
+        android:layout_height="50dp">
+        <ListView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:id="@+id/list3" />
+    </ScrollView>
 
     <Button
         android:layout_width="wrap_content"
@@ -61,4 +68,4 @@
 
 
 </LinearLayout>
-</ScrollView>
+

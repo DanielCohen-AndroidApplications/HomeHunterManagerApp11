@@ -173,7 +173,7 @@ public class ConfirmActivity extends Activity implements OnMapReadyCallback {
 
         credentialsProvider = new CognitoCachingCredentialsProvider(
                 getApplicationContext(),
-                "us-east-1:ceae0626-1082-4759-85c3-fae01752889a", // Identity Pool ID
+                "us-east-1:db3a6e00-7c35-4f48-b956-eaf3375a024f", // Identity Pool ID
                 Regions.US_EAST_1 // Region
         );
         syncClient = new CognitoSyncManager(
@@ -568,10 +568,12 @@ public class ConfirmActivity extends Activity implements OnMapReadyCallback {
 
         @Override
         protected void onPostExecute(ArrayList<Bitmap> bitmaps) {
-            imageView5.setImageBitmap(bitmaps.get(0));
-            imageView6.setImageBitmap(bitmaps.get(1));
-            imageView7.setImageBitmap(bitmaps.get(2));
-            imageView8.setImageBitmap(bitmaps.get(3));
+            for(int b=0;b<bitmaps.size();b++) {
+                if(b==0){imageView5.setImageBitmap(bitmaps.get(b));}
+                if(b==1){imageView6.setImageBitmap(bitmaps.get(b));}
+                if(b==2){imageView7.setImageBitmap(bitmaps.get(b));}
+                if(b==3){imageView8.setImageBitmap(bitmaps.get(3));}
+            }
         }
 
 
