@@ -111,6 +111,7 @@ public class ScheduleActivity extends Activity {
         dateArrayList = new ArrayList<>();
         dateArrayLists=new ArrayList<>();
         apptArrayList=new ArrayList<>();
+        confApptArrayList=new ArrayList<>();
         //Initialize CustomCalendarView from layout
         calendarView = (CustomCalendarView) findViewById(R.id.calendar_view);
         FacebookSdk.sdkInitialize(getApplicationContext());
@@ -394,44 +395,45 @@ public class ScheduleActivity extends Activity {
                     }
 
                 }
-                dayView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        try{
-                            for(int x=0;x<dates.toString().split(",").length;x++){
-                                dateArrayList.add(dates.toString().split(",")[x]);
-                            }}catch (Exception e){
-                            e.printStackTrace();
-                        }
-                        try{
-                            for(int x=0;x<appts.toString().split(",").length;x++){
-                                apptArrayList.add(appts.toString().split(",")[x]);
-                            }}catch (Exception e){
-                            e.printStackTrace();
-                        }
-                        try{
-                            for(int x=0;x<confAppts.toString().split(",").length;x++){
-                                confApptArrayList.add(confApptArrayList.toString().split(",")[x]);
-                            }}catch (Exception e){
-                            e.printStackTrace();
-                        }
-                        try {
-                            Bundle bundle = new Bundle();
-                            bundle.putString("date", dayView.getDate().toString());//
-                            if(!string.isEmpty()){bundle.putString("address", string.replace("[", "").replace("+", ""));}
-                            if(!status.isEmpty()){bundle.putString("status",status);}
-                            if(!dateArrayList.isEmpty()){bundle.putStringArrayList("dateArrayList",dateArrayList);}
-                            if(!apptArrayList.isEmpty()){bundle.putStringArrayList("apptArrayList",apptArrayList);}
-                            if(!confApptArrayList.isEmpty()){bundle.putStringArrayList("confApptArrayList",confApptArrayList);}
-                            CustomListDialog cdd = new CustomListDialog(ScheduleActivity.this, bundle);
-                            cdd.show();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
+
                 if(numSlots>0||numAppts>0||numConfAppts>0) {
                     dayView.setText(dayView.getDate().toString().split(" ")[2]+"\n"+numSlots + " timeslots set as available" + "\n" + numAppts + " timeslots awaiting confirmation" + "\n" + numConfAppts + " appointments confirmed!");
+                    dayView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            try{
+                                for(int x=0;x<dates.toString().split(",").length;x++){
+                                    dateArrayList.add(dates.toString().split(",")[x]);
+                                }}catch (Exception e){
+                                e.printStackTrace();
+                            }
+                            try{
+                                for(int x=0;x<appts.toString().split(",").length;x++){
+                                    apptArrayList.add(appts.toString().split(",")[x]);
+                                }}catch (Exception e){
+                                e.printStackTrace();
+                            }
+                            try{
+                                for(int x=0;x<confAppts.toString().split(",").length;x++){
+                                    confApptArrayList.add(confAppts.toString().split(",")[x]);
+                                }}catch (Exception e){
+                                e.printStackTrace();
+                            }
+                            try {
+                                Bundle bundle = new Bundle();
+                                bundle.putString("date", dayView.getDate().toString());//
+                                if(!string.isEmpty()){bundle.putString("address", string.replace("[", "").replace("+", ""));}
+                                if(!status.isEmpty()){bundle.putString("status",status);}
+                                if(!dateArrayList.isEmpty()){bundle.putStringArrayList("dateArrayList",dateArrayList);}
+                                if(!apptArrayList.isEmpty()){bundle.putStringArrayList("apptArrayList",apptArrayList);}
+                                if(!confApptArrayList.isEmpty()){bundle.putStringArrayList("confApptArrayList",confApptArrayList);}
+                                CustomListDialog cdd = new CustomListDialog(ScheduleActivity.this, bundle);
+                                cdd.show();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
                 }
             }
 
