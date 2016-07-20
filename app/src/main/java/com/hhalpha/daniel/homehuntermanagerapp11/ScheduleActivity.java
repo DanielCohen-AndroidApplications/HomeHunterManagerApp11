@@ -88,13 +88,15 @@ public class ScheduleActivity extends Activity {
     CustomCalendarView calendarView;
     Calendar currentCalendar;
     List<DayDecorator> list;
-    ArrayList<Date> dates;
+    ArrayList<Date> dates, appts, confAppts;
     DynamoDBMapper mapper;
     CognitoCachingCredentialsProvider credentialsProvider;
     CognitoSyncManager syncClient;
     Timeslot timeslot;
     AmazonDynamoDB dynamoDB;
     AmazonDynamoDBClient ddbClient;
+    ArrayList<Integer> apptIndicies;
+    int apptIndex;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -322,7 +324,9 @@ public class ScheduleActivity extends Activity {
         };
         new dynamoTask().execute();
         dates=new ArrayList<>();
-
+        appts=new ArrayList<>();
+        confAppts=new ArrayList<>();
+        apptIndicies=new ArrayList<>();
         try{
             Bundle bundle = getIntent().getBundleExtra("bundle");
             string=bundle.getString("string");
@@ -333,6 +337,8 @@ public class ScheduleActivity extends Activity {
         initializeCalendar();
 
         new retrieveTask().execute();
+        new retrieveApptsTask().execute();
+        new retrieveConfApptsTask().execute();
     }
 
     @Override
@@ -345,41 +351,127 @@ public class ScheduleActivity extends Activity {
         @Override
         public void decorate(final DayView dayView) {
 
-            for(int i = 0; i<dates.size();i++) {
-                if (dates.get(i).toString().replace("[","").replace("]","").contains(dayView.getDate().toString().split(" ")[0] + " " + dayView.getDate().toString().split(" ")[1] + " " + dayView.getDate().toString().split(" ")[2])) {
+            for (int i = 0; i < dates.size(); i++) {
+                apptIndex = i;
+                if (dates.get(i).toString().replace("[", "").replace("]", "").contains(dayView.getDate().toString().split(" ")[0] + " " + dayView.getDate().toString().split(" ")[1] + " " + dayView.getDate().toString().split(" ")[2])) {
 
                     dayView.setBackgroundColor(Color.parseColor("#FFa7a7"));
-                    dayView.setText(dayView.getText().toString()+"\n"+dates.get(i));
+                    dayView.setText(dates.get(i).toString());
                     dayView.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             try {
                                 Bundle bundle = new Bundle();
                                 bundle.putString("address", string.replace("[", "").replace("+", ""));
-                                bundle.putString("date", dayView.getDate().toString());
-                                SimpleDateFormat df = new SimpleDateFormat("EEE MMM dd hh:mm a yyyy");
-                                Toast.makeText(ScheduleActivity.this, df.format(dayView.getDate()), Toast.LENGTH_SHORT).show();
+                                bundle.putString("date", dates.get(apptIndex).toString());//
+                                bundle.putString("status","available");
+
                                 CustomDialogClass cdd = new CustomDialogClass(ScheduleActivity.this, bundle);
 //                    cdd.setTitle(string.replace("[","").replace("+",""));
-                                cdd.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                                    @Override
-                                    public void onDismiss(DialogInterface dialog) {
-                                        Intent i = getIntent();
-                                        startActivity(i);
-                                    }
-                                });
+//                                cdd.setOnDismissListener(new DialogInterface.OnDismissListener() {
+//                                    @Override
+//                                    public void onDismiss(DialogInterface dialog) {
+//                                        dayView.setBackgroundColor(Color.parseColor("#a7a7a7"));
+//                                        dayView.setText("Awaiting confirmation for " + dayView.getText().toString());
+//                                        SimpleDateFormat df = new SimpleDateFormat("EEE MMM dd hh:mm a yyyy", Locale.US);
+//                                        Toast.makeText(ScheduleActivity.this, df.format(dayView.getDate()), Toast.LENGTH_SHORT).show();
+//
+//                                        Intent i = getIntent();
+//                                        startActivity(i);
+//                                    }
+//                                });
+
                                 cdd.show();
-                            }catch(Exception e){
+                            } catch (Exception e) {
                                 e.printStackTrace();
                             }
                         }
                     });
                 }
 
+                if (isPastDay(dayView.getDate())) {
+                    dayView.setBackgroundColor(Color.parseColor("#a7a7FF"));
+                }
+
             }
-            if(isPastDay(dayView.getDate())){
-                dayView.setBackgroundColor(Color.parseColor("#a7a7FF"));
-            }
+            for (int y = 0; y < appts.size(); y++) {
+                apptIndex = y;
+                if (appts.get(y).toString().replace("[", "").replace("]", "").contains(dayView.getDate().toString().split(" ")[0] + " " + dayView.getDate().toString().split(" ")[1] + " " + dayView.getDate().toString().split(" ")[2])) {
+
+                    dayView.setBackgroundColor(Color.parseColor("#a7a7bb"));
+                    dayView.setText("Awaiting confirmation for " + appts.get(y).toString());
+                    dayView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            try {
+                                Bundle bundle = new Bundle();
+                                bundle.putString("address", string.replace("[", "").replace("+", ""));
+                                bundle.putString("date", dates.get(apptIndex).toString());//
+                                bundle.putString("status", "requested");
+                                CustomApptsDialogClass cdd = new CustomApptsDialogClass(ScheduleActivity.this, bundle);
+//                    cdd.setTitle(string.replace("[","").replace("+",""));
+//                                    cdd.setOnDismissListener(new DialogInterface.OnDismissListener() {
+//                                        @Override
+//                                        public void onDismiss(DialogInterface dialog) {
+//                                            dayView.setBackgroundColor(Color.parseColor("#a7a7a7"));
+//                                            dayView.setText("Awaiting confirmation for "+dayView.getText().toString());
+//                                            SimpleDateFormat df = new SimpleDateFormat("EEE MMM dd hh:mm a yyyy", Locale.US);
+//                                            Toast.makeText(ScheduleActivity.this, df.format(dayView.getDate()), Toast.LENGTH_SHORT).show();
+//
+//                                            Intent i = getIntent();
+//                                            startActivity(i);
+//                                        }
+//                                    });
+
+                                cdd.show();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+                    }
+                }
+                for (int z = 0; z < confAppts.size(); z++) {
+                    apptIndex = z;
+                    Log.v("_dan confAppts"+z,confAppts.get(z).toString());
+                    Log.v("dan dayview get date",dayView.getDate().toString());
+                    if (confAppts.get(z).toString().replace("[", "").replace("]", "").contains(dayView.getDate().toString().split(" ")[0] + " " + dayView.getDate().toString().split(" ")[1] + " " + dayView.getDate().toString().split(" ")[2])) {
+
+                        dayView.setBackgroundColor(Color.parseColor("#00FF00"));
+                        dayView.setText("Confirmed! " + confAppts.get(z).toString());
+                        dayView.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+//                                try {
+//                                    Bundle bundle = new Bundle();
+//                                    bundle.putString("address", string.replace("[", "").replace("+", ""));
+//                                    bundle.putString("date", dates.get(apptIndex).toString());//
+//                                    bundle.putString("status","requested");
+//                                    CustomApptsDialogClass cdd = new CustomApptsDialogClass(ScheduleActivity.this, bundle);
+////                    cdd.setTitle(string.replace("[","").replace("+",""));
+////                                    cdd.setOnDismissListener(new DialogInterface.OnDismissListener() {
+////                                        @Override
+////                                        public void onDismiss(DialogInterface dialog) {
+////                                            dayView.setBackgroundColor(Color.parseColor("#a7a7a7"));
+////                                            dayView.setText("Awaiting confirmation for "+dayView.getText().toString());
+////                                            SimpleDateFormat df = new SimpleDateFormat("EEE MMM dd hh:mm a yyyy", Locale.US);
+////                                            Toast.makeText(ScheduleActivity.this, df.format(dayView.getDate()), Toast.LENGTH_SHORT).show();
+////
+////                                            Intent i = getIntent();
+////                                            startActivity(i);
+////                                        }
+////                                    });
+//
+//                                    cdd.show();
+//                                }catch(Exception e){
+//                                    e.printStackTrace();
+//                                }
+                            }
+                        });
+                    }
+
+                }
+
         }
     }
     private boolean isPastDay(Date date) {
@@ -444,6 +536,83 @@ public class ScheduleActivity extends Activity {
             }
             Log.v("_dan dates after scan", dates.toString());
 
+            return null;
+        }
+
+//        @Override
+//        protected void onPostExecute(String s) {
+//            initializeCalendar();
+//        }
+
+
+    }
+    public class retrieveApptsTask extends AsyncTask<String, Integer, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            syncClient = new CognitoSyncManager(
+                    getApplicationContext(),
+                    Regions.US_EAST_1, // Region
+                    credentialsProvider);
+            credentialsProvider.refresh();
+            ddbClient = new AmazonDynamoDBClient(credentialsProvider);
+            mapper = new DynamoDBMapper(ddbClient);
+
+
+            DynamoDBScanExpression scanExpression = new DynamoDBScanExpression();
+            PaginatedScanList<Appointment> result = mapper.scan(Appointment.class, scanExpression);
+            for(int i=0;i<result.size();i++) {
+                try{
+                    if(result.get(i).getTime().split("@")[1].contains(string.replace("[","").replace("]","").replace("+","").replace(",",""))) {
+                        appts.add(new SimpleDateFormat("EEE MMM dd hh:mm a yyyy", Locale.US).parse(result.get(i).getTime().split("@")[0]));
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+                Log.v("_dan ddbScan", result.get(i).getTime().toString());
+
+            }
+            Log.v("_dan dates after scan", dates.toString());
+//            initializeCalendar();
+            return null;
+        }
+
+//        @Override
+//        protected void onPostExecute(String s) {
+//            initializeCalendar();
+//        }
+
+
+    }
+
+    public class retrieveConfApptsTask extends AsyncTask<String, Integer, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            syncClient = new CognitoSyncManager(
+                    getApplicationContext(),
+                    Regions.US_EAST_1, // Region
+                    credentialsProvider);
+            credentialsProvider.refresh();
+            ddbClient = new AmazonDynamoDBClient(credentialsProvider);
+            mapper = new DynamoDBMapper(ddbClient);
+
+
+            DynamoDBScanExpression scanExpression = new DynamoDBScanExpression();
+            PaginatedScanList<ConfirmedAppointment> result = mapper.scan(ConfirmedAppointment.class, scanExpression);
+            for(int i=0;i<result.size();i++) {
+                try{
+                    if(result.get(i).getTime().split("@")[1].contains(string.replace("[","").replace("]","").replace("+","").replace(",",""))) {
+                        confAppts.add(new SimpleDateFormat("EEE MMM dd hh:mm a yyyy", Locale.US).parse(result.get(i).getTime().split("@")[0]));
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+                Log.v("_dan ddbScan", result.get(i).getTime().toString());
+
+            }
+            Log.v("_dan dates after scan", dates.toString());
+//            initializeCalendar();
             return null;
         }
 
