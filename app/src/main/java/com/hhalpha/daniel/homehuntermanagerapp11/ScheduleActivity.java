@@ -406,6 +406,7 @@ public class ScheduleActivity extends Activity {
 
                 }
 
+                //
                 if(numSlots>0||numAppts>0||numConfAppts>0) {
                     dayView.setText(dayView.getDate().toString().split(" ")[2]+"\n"+numConfAppts + " appointments confirmed!"+ "\n"+numSlots + " timeslots set as available" + "\n" + numAppts + " timeslots awaiting confirmation");
                     dayView.setOnClickListener(new View.OnClickListener() {
@@ -415,7 +416,7 @@ public class ScheduleActivity extends Activity {
                                 for(int x=0;x<dates.toString().split(",").length;x++){
                                     Log.v("_dan sched dates",dates.toString().split(",")[x]);
                                     Log.v("_dan sched dayview",dayView.getDate().toString());
-                                    if(dates.toString().split(",")[x].contains(dayView.getDate().toString().split(" ")[0]+" "+dayView.getDate().toString().split(" ")[1]+" "+dayView.getDate().toString().split(" ")[2])){
+                                    if(dates.toString().split(",")[x].contains(dayView.getDate().toString().split(" ")[0]+" "+dayView.getDate().toString().split(" ")[1]+" "+dayView.getDate().toString().split(" ")[2])&&!dateArrayList.toString().contains(dayView.getDate().toString().split(" ")[3])){
                                         dateArrayList.add(dates.toString().split(",")[x]);
                                     }
                                 }
@@ -426,7 +427,7 @@ public class ScheduleActivity extends Activity {
                             try{
                                 for(int x=0;x<appts.toString().split(",").length;x++){
                                     Log.v("_dan sched appts",appts.toString().split(",")[x]);
-                                    if(appts.toString().split(",")[x].contains(dayView.getDate().toString().split(" ")[0]+" "+dayView.getDate().toString().split(" ")[1]+" "+dayView.getDate().toString().split(" ")[2])){
+                                    if(appts.toString().split(",")[x].contains(dayView.getDate().toString().split(" ")[0]+" "+dayView.getDate().toString().split(" ")[1]+" "+dayView.getDate().toString().split(" ")[2])&&!apptArrayList.toString().contains(dayView.getDate().toString().split(" ")[3])){
                                         apptArrayList.add(appts.toString().split(",")[x]);
 //                                        requested=true;
                                     }
@@ -438,7 +439,7 @@ public class ScheduleActivity extends Activity {
                             try{
                                 for(int x=0;x<confAppts.toString().split(",").length;x++){
                                     Log.v("_dan sched conf appts",confAppts.toString().split(",")[x]);
-                                    if(confAppts.toString().split(",")[x].contains(dayView.getDate().toString().split(" ")[0]+" "+dayView.getDate().toString().split(" ")[1]+" "+dayView.getDate().toString().split(" ")[2])){
+                                    if(confAppts.toString().split(",")[x].contains(dayView.getDate().toString().split(" ")[0]+" "+dayView.getDate().toString().split(" ")[1]+" "+dayView.getDate().toString().split(" ")[2])&&!confApptArrayList.contains(dayView.getDate().toString().split(" ")[3])){
                                         confApptArrayList.add(confAppts.toString().split(",")[x]);
 //                                        confirmed=true;
                                     }
@@ -468,6 +469,13 @@ public class ScheduleActivity extends Activity {
                                 Log.v("_dan sched confAppt2",confApptArrayList.toString());
                                 Log.v("_dan sched conf",confirmed.toString());
                                 CustomListDialog cdd = new CustomListDialog(ScheduleActivity.this, bundle);
+                                cdd.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                                    @Override
+                                    public void onDismiss(DialogInterface dialog) {
+                                        Intent i = getIntent();
+                                        startActivity(i);
+                                    }
+                                });
                                 cdd.show();
                             } catch (Exception e) {
                                 e.printStackTrace();
