@@ -371,12 +371,12 @@ public class ScheduleActivity extends Activity {
             numConfAppts=0;
             if (isPastDay(dayView.getDate())) {
                 dayView.setBackgroundColor(Color.parseColor("#a7a7FF"));
-            }else {
+            }else {//determine if each date includes available, requested, or confirmed time slots, and if so, how many.
                 for (int i = 0; i < dates.size(); i++) {
                     apptIndex = i;
                     if (dates.get(i).toString().replace("[", "").replace("]", "").contains(dayView.getDate().toString().split(" ")[0] + " " + dayView.getDate().toString().split(" ")[1] + " " + dayView.getDate().toString().split(" ")[2])) {
 //                        statusList.add("available");
-                        available=true;
+//                        available=true;
                         numSlots++;
                         dayView.setBackgroundColor(Color.parseColor("#cca7a7"));
                     }
@@ -387,7 +387,7 @@ public class ScheduleActivity extends Activity {
                     apptIndex = y;
                     if (appts.get(y).toString().replace("[", "").replace("]", "").contains(dayView.getDate().toString().split(" ")[0] + " " + dayView.getDate().toString().split(" ")[1] + " " + dayView.getDate().toString().split(" ")[2])) {
 //                        statusList.add("requested");
-                        requested=true;
+//                        requested=true;
                         numAppts++;
                         dayView.setBackgroundColor(Color.parseColor("#a7a7bb"));
                     }
@@ -399,7 +399,7 @@ public class ScheduleActivity extends Activity {
                     Log.v("_dan confAppts" + z, confAppts.get(z).toString());
                     Log.v("dan dayview get date", dayView.getDate().toString());
                     if (confAppts.get(z).toString().replace("[", "").replace("]", "").contains(dayView.getDate().toString().split(" ")[0] + " " + dayView.getDate().toString().split(" ")[1] + " " + dayView.getDate().toString().split(" ")[2])) {
-                        confirmed=true;
+//                        confirmed=true;
                         numConfAppts++;
                         dayView.setBackgroundColor(Color.parseColor("#00FF00"));
                     }
