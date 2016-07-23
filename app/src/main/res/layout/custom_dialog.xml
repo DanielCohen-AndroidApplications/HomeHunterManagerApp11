@@ -84,13 +84,21 @@
             android:id="@+id/checkBoxMonth" />
             </LinearLayout>
 </LinearLayout>
+
     <Button
         android:id="@+id/btn_yes"
         android:layout_width="100dp"
         android:layout_height="30dp"
         android:background="@android:color/white"
         android:clickable="true"
-        android:text="Set time"
+        android:text="Edit timeslot"
         android:textColor="#5DBCD2"
         android:textStyle="bold" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Cancel Timeslot"
+        android:id="@+id/btn_delete"
+        android:visibility="gone" />
 </LinearLayout>

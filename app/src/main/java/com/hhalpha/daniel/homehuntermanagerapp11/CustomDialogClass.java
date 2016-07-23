@@ -32,7 +32,10 @@ import com.amazonaws.AmazonWebServiceRequest;
 import com.amazonaws.ResponseMetadata;
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
 import com.amazonaws.mobileconnectors.cognito.CognitoSyncManager;
+import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBDeleteExpression;
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBMapper;
+import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBScanExpression;
+import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.PaginatedScanList;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
@@ -90,11 +93,11 @@ public class CustomDialogClass extends Dialog implements
 
     public Activity c;
 
-    public Button yes;
+    public Button yes,btn_delete;
     TextView txt_dia;
     AmazonDynamoDBClient ddbClient;
     Spinner spinnerHours, spinnerMinutes;
-    String hours, mins, date, address;
+    String hours, mins, oldHours,oldMins, date, address;
     DynamoDBMapper mapper;
     AmazonDynamoDB dynamoDB;
     String idPool;
@@ -103,7 +106,10 @@ public class CustomDialogClass extends Dialog implements
     Timeslot timeslot;
     CheckBox checkBoxAM, checkBoxPM;
     String amPm;
-    Boolean available, requested, confirmed,edit;
+    Boolean available, requested, confirmed,edit,deleting;
+    int clicks;
+    Appointment appointment;
+    ConfirmedAppointment confAppt;
     public CustomDialogClass(Activity a, Bundle args) {
         super(a);
         // TODO Auto-generated constructor stub
@@ -130,74 +136,6 @@ public class CustomDialogClass extends Dialog implements
         requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         setContentView(R.layout.custom_dialog);
-        try{
-            Log.v("_dan",date);
-            Log.v("_dan available",available.toString());
-            Log.v("_dan requested",requested.toString());
-            Log.v("_dan conf",confirmed.toString());
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-
-        checkBoxPM=(CheckBox) findViewById(R.id.checkBoxPM);
-        checkBoxAM=(CheckBox) findViewById(R.id.checkBoxAM);
-        txt_dia=(TextView)findViewById(R.id.txt_dia);
-        txt_dia.setText(date.split(" ")[0].toString()+" "+date.split(" ")[1].toString()+" "+date.split(" ")[2].toString()+"\n"+address);
-        yes = (Button) findViewById(R.id.btn_yes);
-
-        yes.setOnClickListener(this);
-        spinnerHours = (Spinner) findViewById(R.id.spinnerHours);
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
-                R.array.Hours, android.R.layout.simple_spinner_item);
-// Specify the layout to use when the list of choices appears
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-// Apply the adapter to the spinner
-        spinnerHours.setAdapter(adapter);
-        spinnerHours.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                hours=parent.getItemAtPosition(position).toString();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-        spinnerMinutes = (Spinner) findViewById(R.id.spinnerMinutes);
-        ArrayAdapter<CharSequence> adapter2 = ArrayAdapter.createFromResource(getContext(),
-                R.array.Minutes, android.R.layout.simple_spinner_item);
-// Specify the layout to use when the list of choices appears
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-// Apply the adapter to the spinner
-        spinnerMinutes.setAdapter(adapter2);
-        spinnerMinutes.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                mins=parent.getItemAtPosition(position).toString();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-        if(edit){
-            try {
-                hours = date.split(" ")[3].split(":")[0];
-                mins = date.split(" ")[3].split(":")[1];
-                if(Integer.parseInt(hours)<13) {
-                    spinnerHours.setSelection(Integer.parseInt(hours), true);
-                    checkBoxAM.setChecked(true);
-                }else{
-                    spinnerHours.setSelection(Integer.parseInt(hours)-12, true);
-                    checkBoxPM.setChecked(true);
-                }
-                spinnerMinutes.setSelection((Integer.parseInt(mins) / 15) + 1, true);
-            }catch(Exception e){
-                e.printStackTrace();
-            }
-        }
         FacebookSdk.sdkInitialize(getContext());
         try{
             credentialsProvider = new CognitoCachingCredentialsProvider(
@@ -417,6 +355,86 @@ public class CustomDialogClass extends Dialog implements
                 return null;
             }
         };
+        clicks=0;
+        deleting=false;
+        try{
+            Log.v("_dan",date);
+            Log.v("_dan available",available.toString());
+            Log.v("_dan requested",requested.toString());
+            Log.v("_dan conf",confirmed.toString());
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        checkBoxPM=(CheckBox) findViewById(R.id.checkBoxPM);
+        checkBoxAM=(CheckBox) findViewById(R.id.checkBoxAM);
+        txt_dia=(TextView)findViewById(R.id.txt_dia);
+        txt_dia.setText(date.split(" ")[0].toString()+" "+date.split(" ")[1].toString()+" "+date.split(" ")[2].toString()+"\n"+address);
+        yes = (Button) findViewById(R.id.btn_yes);
+        btn_delete=(Button) findViewById(R.id.btn_delete);
+        yes.setOnClickListener(this);
+        btn_delete.setOnClickListener(this);
+        spinnerHours = (Spinner) findViewById(R.id.spinnerHours);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
+                R.array.Hours, android.R.layout.simple_spinner_item);
+// Specify the layout to use when the list of choices appears
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+// Apply the adapter to the spinner
+        spinnerHours.setAdapter(adapter);
+        spinnerHours.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                hours=parent.getItemAtPosition(position).toString();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+        spinnerMinutes = (Spinner) findViewById(R.id.spinnerMinutes);
+        ArrayAdapter<CharSequence> adapter2 = ArrayAdapter.createFromResource(getContext(),
+                R.array.Minutes, android.R.layout.simple_spinner_item);
+// Specify the layout to use when the list of choices appears
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+// Apply the adapter to the spinner
+        spinnerMinutes.setAdapter(adapter2);
+        spinnerMinutes.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                mins=parent.getItemAtPosition(position).toString();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+        if(edit){
+            btn_delete.setVisibility(View.VISIBLE);
+            try {
+                oldHours = date.split(" ")[3].split(":")[0];
+                oldMins = date.split(" ")[3].split(":")[1];
+                if(Integer.parseInt(oldHours)<13) {
+                    spinnerHours.setSelection(Integer.parseInt(oldHours), true);
+                    checkBoxAM.setChecked(true);
+                    amPm=" AM ";
+                }else{
+                    spinnerHours.setSelection(Integer.parseInt(oldHours)-12, true);
+                    Integer oldHoursAdjusted=Integer.parseInt(oldHours)-12;
+                    oldHours= oldHoursAdjusted.toString();
+                    checkBoxPM.setChecked(true);
+                    amPm=" PM ";
+                }
+                if(Integer.parseInt(oldHours)<10&&oldHours.length()>1){
+                    oldHours="0"+oldHours;
+                }
+                spinnerMinutes.setSelection((Integer.parseInt(oldMins) / 15) + 1, true);
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+        }
+
 //        new dynamoTask().execute();
 //        new retrieveTask().execute();
     }
@@ -433,7 +451,9 @@ public class CustomDialogClass extends Dialog implements
                     amPm=" AM ";
                 }
                 new dynamoTask().execute();
-
+            case R.id.btn_delete:
+                deleting=true;
+                new dynamoTask().execute();
         }
 
     }
@@ -448,11 +468,77 @@ public class CustomDialogClass extends Dialog implements
             credentialsProvider.refresh();
             ddbClient = new AmazonDynamoDBClient(credentialsProvider);
             mapper = new DynamoDBMapper(ddbClient);
-            timeslot=new Timeslot();
+
             try {
-                timeslot.setTime(date.split(" ")[0].toString()+" "+date.split(" ")[1].toString()+" "+date.split(" ")[2].toString()+" "+hours+":"+mins+amPm+date.split(" ")[5].toString()+" @ "+address);
-                timeslot.setHost(Profile.getCurrentProfile().getName());
-                mapper.save(timeslot);
+                Log.v("_dan time string uno",date.split(" ")[0].toString().replace("[","").replace("]","")+" "+date.split(" ")[1].toString()+" "+date.split(" ")[2].toString()+" "+oldHours+":"+oldMins+amPm+date.split(" ")[5].toString().replace("[","").replace("]","")+" @ "+address);
+                if(deleting&&available){
+                    timeslot=new Timeslot();
+                    try{
+                        DynamoDBScanExpression scanExpression = new DynamoDBScanExpression();
+                        PaginatedScanList<Timeslot> result = mapper.scan(Timeslot.class, scanExpression);
+                        for(int i=0;i<result.size();i++) {
+                            if (result.get(i).getTime().split("@")[1].contains(address.replace("[", "").replace("]", "").replace("+", "").replace(",", ""))) {
+                                Log.v("_dan custdialog result",result.get(i).getTime().split("@")[1]);
+//                                confAppt.setHost(result.get(i).getHost());
+//                                confAppt.setTime(result.get(i).getTime());
+                                timeslot=result.get(i);
+                            }
+                        }
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                    try{
+                        mapper.delete(timeslot);
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }else if(deleting && requested) {
+                    appointment=new Appointment();
+                    try{
+                        DynamoDBScanExpression scanExpression = new DynamoDBScanExpression();
+                        PaginatedScanList<Appointment> result = mapper.scan(Appointment.class, scanExpression);
+                        for(int i=0;i<result.size();i++) {
+                            if (result.get(i).getTime().split("@")[1].contains(address.replace("[", "").replace("]", "").replace("+", "").replace(",", ""))) {
+                                Log.v("_dan custdialog result",result.get(i).getTime().split("@")[1]);
+//                                confAppt.setHost(result.get(i).getHost());
+//                                confAppt.setTime(result.get(i).getTime());
+                                appointment=result.get(i);
+                            }
+                        }
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                    try{
+                        mapper.delete(appointment);
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }else if(deleting && confirmed) {
+                    confAppt= new ConfirmedAppointment();
+                    try{
+                        DynamoDBScanExpression scanExpression = new DynamoDBScanExpression();
+                        PaginatedScanList<ConfirmedAppointment> result = mapper.scan(ConfirmedAppointment.class, scanExpression);
+                        for(int i=0;i<result.size();i++) {
+                            if (result.get(i).getTime().split("@")[1].contains(address.replace("[", "").replace("]", "").replace("+", "").replace(",", ""))) {
+                                Log.v("_dan custdialog result",result.get(i).getTime().split("@")[1]);
+//                                confAppt.setHost(result.get(i).getHost());
+//                                confAppt.setTime(result.get(i).getTime());
+                                confAppt=result.get(i);
+                            }
+                        }
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                    try{
+                        mapper.delete(confAppt);
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }else{
+                    timeslot.setTime(date.split(" ")[0].toString() + " " + date.split(" ")[1].toString() + " " + date.split(" ")[2].toString() + " " + hours + ":" + mins + amPm + date.split(" ")[5].toString() + " @ " + address);
+                    timeslot.setHost(Profile.getCurrentProfile().getName());
+                    mapper.save(timeslot);
+                }
             }catch (Exception e){
                 e.printStackTrace();
             }

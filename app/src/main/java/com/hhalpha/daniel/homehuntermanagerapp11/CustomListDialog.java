@@ -200,6 +200,7 @@ public class CustomListDialog extends Dialog implements
                 list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         bundle.putString("date",list.getItemAtPosition(position).toString());
+                        bundle.putString("address",address);
                         bundle.putBoolean("available",true);
                         bundle.putBoolean("edit",true);
                         CustomDialogClass cdd = new CustomDialogClass(c,bundle);
@@ -220,6 +221,7 @@ public class CustomListDialog extends Dialog implements
                 list2.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         bundle.putString("date",list2.getItemAtPosition(position).toString());
+                        bundle.putString("address",address);
                         bundle.putBoolean("requested",true);
                         bundle.putBoolean("edit",true);
                         CustomDialogClass cdd = new CustomDialogClass(c,bundle);
@@ -240,6 +242,7 @@ public class CustomListDialog extends Dialog implements
                 list3.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         bundle.putString("date",list3.getItemAtPosition(position).toString());
+                        bundle.putString("address",address);
                         bundle.putBoolean("confirmed",true);
                         bundle.putBoolean("edit",true);
                         CustomDialogClass cdd = new CustomDialogClass(c,bundle);
