@@ -45,7 +45,7 @@ public class CustomListViewAdapter2 extends ArrayAdapter<String> {
         }
 
 
-        holder.textViewTime.setText(string);
+        holder.textViewTime.setText(string.replace("[","").replace("]",""));
 
 
         return convertView;

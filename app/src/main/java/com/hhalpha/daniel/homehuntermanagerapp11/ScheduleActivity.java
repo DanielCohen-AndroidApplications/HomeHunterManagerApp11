@@ -100,10 +100,16 @@ public class ScheduleActivity extends Activity {
     int apptIndex, numSlots, numAppts, numConfAppts;
     String status;
     ArrayList<String> dateArrayList, apptArrayList, confApptArrayList, statusList;
+    Boolean available, requested, confirmed;
+    Bundle bundle;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_schedule);
+        bundle=new Bundle();
+        available=false;
+        requested=false;
+        confirmed=false;
         dates=new ArrayList<>();
         appts=new ArrayList<>();
         confAppts=new ArrayList<>();
@@ -112,7 +118,7 @@ public class ScheduleActivity extends Activity {
         dateArrayLists=new ArrayList<>();
         apptArrayList=new ArrayList<>();
         confApptArrayList=new ArrayList<>();
-        statusList=new ArrayList<>();
+
         //Initialize CustomCalendarView from layout
         calendarView = (CustomCalendarView) findViewById(R.id.calendar_view);
         FacebookSdk.sdkInitialize(getApplicationContext());
@@ -369,7 +375,8 @@ public class ScheduleActivity extends Activity {
                 for (int i = 0; i < dates.size(); i++) {
                     apptIndex = i;
                     if (dates.get(i).toString().replace("[", "").replace("]", "").contains(dayView.getDate().toString().split(" ")[0] + " " + dayView.getDate().toString().split(" ")[1] + " " + dayView.getDate().toString().split(" ")[2])) {
-                        statusList.add("available");
+//                        statusList.add("available");
+                        available=true;
                         numSlots++;
                         dayView.setBackgroundColor(Color.parseColor("#cca7a7"));
                     }
@@ -379,18 +386,20 @@ public class ScheduleActivity extends Activity {
                 for (int y = 0; y < appts.size(); y++) {
                     apptIndex = y;
                     if (appts.get(y).toString().replace("[", "").replace("]", "").contains(dayView.getDate().toString().split(" ")[0] + " " + dayView.getDate().toString().split(" ")[1] + " " + dayView.getDate().toString().split(" ")[2])) {
-                        statusList.add("requested");
+//                        statusList.add("requested");
+                        requested=true;
                         numAppts++;
                         dayView.setBackgroundColor(Color.parseColor("#a7a7bb"));
                     }
                 }
 
                 for (int z = 0; z < confAppts.size(); z++) {
-                    statusList.add("confirmed");
+//                    statusList.add("confirmed");
                     apptIndex = z;
                     Log.v("_dan confAppts" + z, confAppts.get(z).toString());
                     Log.v("dan dayview get date", dayView.getDate().toString());
                     if (confAppts.get(z).toString().replace("[", "").replace("]", "").contains(dayView.getDate().toString().split(" ")[0] + " " + dayView.getDate().toString().split(" ")[1] + " " + dayView.getDate().toString().split(" ")[2])) {
+                        confirmed=true;
                         numConfAppts++;
                         dayView.setBackgroundColor(Color.parseColor("#00FF00"));
                     }
@@ -398,36 +407,66 @@ public class ScheduleActivity extends Activity {
                 }
 
                 if(numSlots>0||numAppts>0||numConfAppts>0) {
-                    dayView.setText(dayView.getDate().toString().split(" ")[2]+"\n"+numSlots + " timeslots set as available" + "\n" + numAppts + " timeslots awaiting confirmation" + "\n" + numConfAppts + " appointments confirmed!");
+                    dayView.setText(dayView.getDate().toString().split(" ")[2]+"\n"+numConfAppts + " appointments confirmed!"+ "\n"+numSlots + " timeslots set as available" + "\n" + numAppts + " timeslots awaiting confirmation");
                     dayView.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             try{
                                 for(int x=0;x<dates.toString().split(",").length;x++){
-                                    dateArrayList.add(dates.toString().split(",")[x]);
-                                }}catch (Exception e){
+                                    Log.v("_dan sched dates",dates.toString().split(",")[x]);
+                                    Log.v("_dan sched dayview",dayView.getDate().toString());
+                                    if(dates.toString().split(",")[x].contains(dayView.getDate().toString().split(" ")[0]+" "+dayView.getDate().toString().split(" ")[1]+" "+dayView.getDate().toString().split(" ")[2])){
+                                        dateArrayList.add(dates.toString().split(",")[x]);
+                                    }
+                                }
+//                                bundle.putBoolean("available",available);
+                            }catch (Exception e){
                                 e.printStackTrace();
                             }
                             try{
                                 for(int x=0;x<appts.toString().split(",").length;x++){
-                                    apptArrayList.add(appts.toString().split(",")[x]);
-                                }}catch (Exception e){
+                                    Log.v("_dan sched appts",appts.toString().split(",")[x]);
+                                    if(appts.toString().split(",")[x].contains(dayView.getDate().toString().split(" ")[0]+" "+dayView.getDate().toString().split(" ")[1]+" "+dayView.getDate().toString().split(" ")[2])){
+                                        apptArrayList.add(appts.toString().split(",")[x]);
+//                                        requested=true;
+                                    }
+                                }
+//                                bundle.putBoolean("requested",requested);
+                            }catch (Exception e){
                                 e.printStackTrace();
                             }
                             try{
                                 for(int x=0;x<confAppts.toString().split(",").length;x++){
-                                    confApptArrayList.add(confAppts.toString().split(",")[x]);
-                                }}catch (Exception e){
+                                    Log.v("_dan sched conf appts",confAppts.toString().split(",")[x]);
+                                    if(confAppts.toString().split(",")[x].contains(dayView.getDate().toString().split(" ")[0]+" "+dayView.getDate().toString().split(" ")[1]+" "+dayView.getDate().toString().split(" ")[2])){
+                                        confApptArrayList.add(confAppts.toString().split(",")[x]);
+//                                        confirmed=true;
+                                    }
+                                }
+//                                bundle.putBoolean("confirmed",confirmed);
+                            }catch (Exception e){
                                 e.printStackTrace();
                             }
                             try {
-                                Bundle bundle = new Bundle();
+                                bundle = new Bundle();
                                 bundle.putString("date", dayView.getDate().toString());//
-                                if(!string.isEmpty()){bundle.putString("address", string.replace("[", "").replace("+", ""));}
-                                if(!statusList.isEmpty()){bundle.putStringArrayList("statusList",statusList);}
-                                if(!dateArrayList.isEmpty()){bundle.putStringArrayList("dateArrayList",dateArrayList);}
-                                if(!apptArrayList.isEmpty()){bundle.putStringArrayList("apptArrayList",apptArrayList);}
-                                if(!confApptArrayList.isEmpty()){bundle.putStringArrayList("confApptArrayList",confApptArrayList);}
+                                if(!string.isEmpty()){bundle.putString("address", string.replace("[", "").replace("]","").replace("+", ""));}
+//                                if(!statusList.isEmpty()){bundle.putStringArrayList("statusList",statusList);}
+                                if(!dateArrayList.isEmpty()){bundle.putStringArrayList("dateArrayList",dateArrayList);
+                                    available= true;}
+                                bundle.putBoolean("available",available);
+                                Log.v("_dan sched dates2",dateArrayList.toString());
+                                Log.v("_dan sched avail",available.toString());
+                                if(!apptArrayList.isEmpty()){bundle.putStringArrayList("apptArrayList",apptArrayList);
+                                    requested= true;}
+                                bundle.putBoolean("requested",requested);
+                                Log.v("_dan sched appts2",apptArrayList.toString());
+                                Log.v("_dan sched avail",requested.toString());
+                                if(!confApptArrayList.isEmpty()){bundle.putStringArrayList("confApptArrayList",confApptArrayList);
+                                    confirmed= true;}
+                                bundle.putBoolean("confirmed",confirmed);
+                                Log.v("_dan sched confAppt2",confApptArrayList.toString());
+                                Log.v("_dan sched conf",confirmed.toString());
                                 CustomListDialog cdd = new CustomListDialog(ScheduleActivity.this, bundle);
                                 cdd.show();
                             } catch (Exception e) {

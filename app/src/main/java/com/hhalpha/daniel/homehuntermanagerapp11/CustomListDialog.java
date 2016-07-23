@@ -84,24 +84,19 @@ public class CustomListDialog extends Dialog implements
     public Button yes;
     TextView txt_dia, txt_dia2, txt_dia3;
     AmazonDynamoDBClient ddbClient;
-    Spinner spinnerHours, spinnerMinutes;
-    String hours, mins, date, address, status;
-    DynamoDBMapper mapper;
+    String date, address;
     AmazonDynamoDB dynamoDB;
-    String idPool;
     CognitoCachingCredentialsProvider credentialsProvider;
     CognitoSyncManager syncClient;
     Timeslot timeslot;
     Appointment appointment;
     ConfirmedAppointment confAppt;
-    CheckBox checkBoxAM, checkBoxPM;
-    String amPm;
     ListView list, list2, list3;
-    String dates,appts,confAppts;
-    ArrayList<String> allDates,dateArrayList, apptArrayList, confApptArrayList, statusList;
+    ArrayList<String> dateArrayList, apptArrayList, confApptArrayList, statusList;
     CustomListViewAdapter2 adapter, adapter2, adapter3;
     int numDates, numAppts, numConfAppts;
     Bundle bundle;
+    Boolean available, requested,confirmed;
     public CustomListDialog(Activity a, Bundle args) {
         super(a);
         // TODO Auto-generated constructor stub
@@ -114,27 +109,62 @@ public class CustomListDialog extends Dialog implements
             e.printStackTrace();
         }
         try {
-            statusList = bundle.getStringArrayList("statusList");
+            dateArrayList = new ArrayList<>();
+            if(bundle.containsKey("dateArrayList")) {
+                for (int i = 0; i < bundle.getStringArrayList("dateArrayList").size(); i++) {
+                    if (bundle.getStringArrayList("dateArrayList").get(i).contains(date.split(" ")[0] + " " + date.split(" ")[1] + " " + date.split(" ")[2])) {
+                        dateArrayList.add(bundle.getStringArrayList("dateArrayList").get(i));
+                    }
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        try {
+            apptArrayList = new ArrayList<>();
+            if(bundle.containsKey("apptArrayList")) {
+                for (int i = 0; i < bundle.getStringArrayList("apptArrayList").size(); i++) {
+                    if (bundle.getStringArrayList("apptArrayList").get(i).contains(date.split(" ")[0] + " " + date.split(" ")[1] + " " + date.split(" ")[2])) {
+                        apptArrayList.add(bundle.getStringArrayList("apptArrayList").get(i));
+                    }
+                }
+            }
         }catch (Exception e){
             e.printStackTrace();
         }
         try {
-            dateArrayList = bundle.getStringArrayList("dateArrayList");
+            confApptArrayList = new ArrayList<>();
+            if(bundle.containsKey("confApptArrayList")) {
+                for (int i = 0; i < bundle.getStringArrayList("confApptArrayList").size(); i++) {
+                    if (bundle.getStringArrayList("confApptArrayList").get(i).contains(date.split(" ")[0] + " " + date.split(" ")[1] + " " + date.split(" ")[2])) {
+                        confApptArrayList.add(bundle.getStringArrayList("confApptArrayList").get(i));
+                    }
+                }
+            }
         }catch (Exception e){
             e.printStackTrace();
         }
         try {
-            apptArrayList = bundle.getStringArrayList("apptArrayList");
+            available = bundle.getBoolean("available");
+            Log.v("_dan cust list avail",available.toString());
         }catch (Exception e){
             e.printStackTrace();
         }
         try {
-            confApptArrayList = bundle.getStringArrayList("confApptArrayList");
+            requested = bundle.getBoolean("requested");
+            Log.v("_dan cust list req",requested.toString());
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        try {
+            confirmed = bundle.getBoolean("confirmed");
+            Log.v("_dan cust list conf",confirmed.toString());
         }catch (Exception e){
             e.printStackTrace();
         }
         Log.v("_dan list dialog info",dateArrayList.toString()+apptArrayList.toString()+confApptArrayList.toString());
-        Log.v("_dan list dialog info",date+address+status);
+        Log.v("_dan list dialog info",date+address);
     }
 
     @Override
@@ -142,84 +172,6 @@ public class CustomListDialog extends Dialog implements
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.custom_dialog3);
-        txt_dia=(TextView)findViewById(R.id.txt_dia);
-        txt_dia2=(TextView)findViewById(R.id.txt_dia2);
-        txt_dia3=(TextView)findViewById(R.id.txt_dia3);
-        list = (ListView) findViewById(R.id.list);
-        list2 = (ListView) findViewById(R.id.list2);
-        list3 = (ListView) findViewById(R.id.list3);
-        try{
-            if(!statusList.contains("available")){
-                txt_dia.setVisibility(View.GONE);
-                list.setVisibility(View.GONE);
-            }
-            if(!statusList.contains("requested")){
-                txt_dia2.setVisibility(View.GONE);
-                list2.setVisibility(View.GONE);
-            }
-            if(!statusList.contains("confirmed")){
-                txt_dia3.setVisibility(View.GONE);
-                list3.setVisibility(View.GONE);
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-
-        yes = (Button) findViewById(R.id.btn_yes);
-        yes.setOnClickListener(this);
-        if(!dateArrayList.isEmpty()) {
-            try {
-
-                adapter = new CustomListViewAdapter2(c.getApplicationContext(), R.layout.list_layout2, dateArrayList);
-                list.setAdapter(adapter);
-                list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                    }
-                });
-                adapter.notifyDataSetChanged();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        if(!apptArrayList.isEmpty()) {
-            try {
-
-                adapter2 = new CustomListViewAdapter2(c.getApplicationContext(), R.layout.list_layout2, apptArrayList);
-                list2.setAdapter(adapter2);
-                list2.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                    }
-
-                });
-                adapter2.notifyDataSetChanged();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        if(!confApptArrayList.isEmpty()) {
-            try {
-
-                adapter3 = new CustomListViewAdapter2(c.getApplicationContext(), R.layout.list_layout2, confApptArrayList);
-
-                list3.setAdapter(adapter3);
-
-                list3.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                    }
-
-                });
-                adapter3.notifyDataSetChanged();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-
         FacebookSdk.sdkInitialize(getContext());
         try{
             credentialsProvider = new CognitoCachingCredentialsProvider(
@@ -233,6 +185,65 @@ public class CustomListDialog extends Dialog implements
         }catch (Exception e){
             e.printStackTrace();
         }
+        txt_dia=(TextView)findViewById(R.id.txt_dia);
+        txt_dia2=(TextView)findViewById(R.id.txt_dia2);
+        txt_dia3=(TextView)findViewById(R.id.txt_dia3);
+        list = (ListView) findViewById(R.id.list);
+        list2 = (ListView) findViewById(R.id.list2);
+        list3 = (ListView) findViewById(R.id.list3);
+        if(available) {
+            try {
+                txt_dia.setVisibility(View.VISIBLE);
+                list.setVisibility(View.VISIBLE);
+                adapter = new CustomListViewAdapter2(c.getBaseContext(), R.layout.list_layout2, dateArrayList);
+                list.setAdapter(adapter);
+                list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                    }
+                });
+                adapter.notifyDataSetChanged();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        if(requested) {
+            try {
+                txt_dia2.setVisibility(View.VISIBLE);
+                list2.setVisibility(View.VISIBLE);
+                adapter2 = new CustomListViewAdapter2(c.getBaseContext(), R.layout.list_layout2, apptArrayList);
+                list2.setAdapter(adapter2);
+                list2.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                    }
+                });
+                adapter2.notifyDataSetChanged();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        if(confirmed) {
+            try {
+                txt_dia3.setVisibility(View.VISIBLE);
+                list3.setVisibility(View.VISIBLE);
+                adapter3 = new CustomListViewAdapter2(c.getBaseContext(), R.layout.list_layout2, confApptArrayList);
+                list3.setAdapter(adapter3);
+                list3.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                    }
+                });
+                adapter3.notifyDataSetChanged();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+
+        yes = (Button) findViewById(R.id.btn_yes);
+        yes.setOnClickListener(this);
+
         dynamoDB=new AmazonDynamoDB() {
             @Override
             public void setEndpoint(String endpoint) throws IllegalArgumentException {
