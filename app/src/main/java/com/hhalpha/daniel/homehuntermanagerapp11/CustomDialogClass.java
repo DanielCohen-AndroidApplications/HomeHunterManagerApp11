@@ -103,12 +103,25 @@ public class CustomDialogClass extends Dialog implements
     Timeslot timeslot;
     CheckBox checkBoxAM, checkBoxPM;
     String amPm;
+    Boolean available, requested, confirmed,edit;
     public CustomDialogClass(Activity a, Bundle args) {
         super(a);
         // TODO Auto-generated constructor stub
         this.c = a;
         address=args.getString("address");
         date=args.getString("date");
+        try{
+            edit=args.getBoolean("edit");
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        try {
+            available = args.getBoolean("available");
+            requested = args.getBoolean("requested");
+            confirmed = args.getBoolean("confirmed");
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -117,6 +130,15 @@ public class CustomDialogClass extends Dialog implements
         requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         setContentView(R.layout.custom_dialog);
+        try{
+            Log.v("_dan",date);
+            Log.v("_dan available",available.toString());
+            Log.v("_dan requested",requested.toString());
+            Log.v("_dan conf",confirmed.toString());
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
         checkBoxPM=(CheckBox) findViewById(R.id.checkBoxPM);
         checkBoxAM=(CheckBox) findViewById(R.id.checkBoxAM);
         txt_dia=(TextView)findViewById(R.id.txt_dia);
@@ -160,6 +182,22 @@ public class CustomDialogClass extends Dialog implements
 
             }
         });
+        if(edit){
+            try {
+                hours = date.split(" ")[3].split(":")[0];
+                mins = date.split(" ")[3].split(":")[1];
+                if(Integer.parseInt(hours)<13) {
+                    spinnerHours.setSelection(Integer.parseInt(hours), true);
+                    checkBoxAM.setChecked(true);
+                }else{
+                    spinnerHours.setSelection(Integer.parseInt(hours)-12, true);
+                    checkBoxPM.setChecked(true);
+                }
+                spinnerMinutes.setSelection((Integer.parseInt(mins) / 15) + 1, true);
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+        }
         FacebookSdk.sdkInitialize(getContext());
         try{
             credentialsProvider = new CognitoCachingCredentialsProvider(

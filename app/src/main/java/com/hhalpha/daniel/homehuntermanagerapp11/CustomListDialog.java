@@ -199,7 +199,11 @@ public class CustomListDialog extends Dialog implements
                 list.setAdapter(adapter);
                 list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
+                        bundle.putString("date",list.getItemAtPosition(position).toString());
+                        bundle.putBoolean("available",true);
+                        bundle.putBoolean("edit",true);
+                        CustomDialogClass cdd = new CustomDialogClass(c,bundle);
+                        cdd.show();
                     }
                 });
                 adapter.notifyDataSetChanged();
@@ -215,7 +219,11 @@ public class CustomListDialog extends Dialog implements
                 list2.setAdapter(adapter2);
                 list2.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
+                        bundle.putString("date",list2.getItemAtPosition(position).toString());
+                        bundle.putBoolean("requested",true);
+                        bundle.putBoolean("edit",true);
+                        CustomDialogClass cdd = new CustomDialogClass(c,bundle);
+                        cdd.show();
                     }
                 });
                 adapter2.notifyDataSetChanged();
@@ -231,7 +239,11 @@ public class CustomListDialog extends Dialog implements
                 list3.setAdapter(adapter3);
                 list3.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
+                        bundle.putString("date",list3.getItemAtPosition(position).toString());
+                        bundle.putBoolean("confirmed",true);
+                        bundle.putBoolean("edit",true);
+                        CustomDialogClass cdd = new CustomDialogClass(c,bundle);
+                        cdd.show();
                     }
                 });
                 adapter3.notifyDataSetChanged();
