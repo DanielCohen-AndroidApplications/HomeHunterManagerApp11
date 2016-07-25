@@ -110,6 +110,7 @@ public class CustomDialogClass extends Dialog implements
     int clicks;
     Appointment appointment;
     ConfirmedAppointment confAppt;
+    Boolean confirming;
     public CustomDialogClass(Activity a, Bundle args) {
         super(a);
         // TODO Auto-generated constructor stub
@@ -119,6 +120,7 @@ public class CustomDialogClass extends Dialog implements
         try{
             edit=args.getBoolean("edit");
         }catch (Exception e){
+            edit=false;
             e.printStackTrace();
         }
         try {
@@ -358,10 +360,11 @@ public class CustomDialogClass extends Dialog implements
         clicks=0;
         deleting=false;
         try{
-            Log.v("_dan",date);
+            Log.v("_dan date",date);
             Log.v("_dan available",available.toString());
             Log.v("_dan requested",requested.toString());
             Log.v("_dan conf",confirmed.toString());
+            Log.v("_dan edit",edit.toString());
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -412,6 +415,7 @@ public class CustomDialogClass extends Dialog implements
         });
         if(edit){
             btn_delete.setVisibility(View.VISIBLE);
+            if(requested){yes.setText("Confirm");}
             try {
                 oldHours = date.split(" ")[3].split(":")[0];
                 oldMins = date.split(" ")[3].split(":")[1];
@@ -441,19 +445,20 @@ public class CustomDialogClass extends Dialog implements
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.btn_yes:
-                Log.v("_dandia",address+"hours="+hours+"mins="+mins);
-
-                if(checkBoxPM.isChecked()){
-                    amPm=" PM ";
-                }else{
-                    amPm=" AM ";
-                }
-                new dynamoTask().execute();
-            case R.id.btn_delete:
-                deleting=true;
-                new dynamoTask().execute();
+        if (v.getId()==R.id.btn_yes) {
+            Log.v("_dandia", address + "hours=" + hours + "mins=" + mins);
+            confirming = true;
+            deleting = false;
+            if (checkBoxPM.isChecked()) {
+                amPm = " PM ";
+            } else {
+                amPm = " AM ";
+            }
+            new dynamoTask().execute();
+        }else{
+            deleting=true;
+            confirming=false;
+            new dynamoTask().execute();
         }
 
     }
@@ -461,6 +466,8 @@ public class CustomDialogClass extends Dialog implements
 
         @Override
         protected String doInBackground(String... params) {
+            Log.v("_dan deleting", deleting.toString());
+            Log.v("_dan confirming", confirming.toString());
             syncClient = new CognitoSyncManager(
                     getContext(),
                     Regions.US_EAST_1, // Region
@@ -513,6 +520,33 @@ public class CustomDialogClass extends Dialog implements
                     }catch (Exception e){
                         e.printStackTrace();
                     }
+                }else if(confirming&&requested) {
+                    appointment=new Appointment();
+                    confAppt= new ConfirmedAppointment();
+                    try{
+                        DynamoDBScanExpression scanExpression = new DynamoDBScanExpression();
+                        PaginatedScanList<Appointment> result = mapper.scan(Appointment.class, scanExpression);
+                        for(int i=0;i<result.size();i++) {
+                            if (result.get(i).getTime().split("@")[1].contains(address.replace("[", "").replace("]", "").replace("+", "").replace(",", "").substring(1))) {
+                                Log.v("_dan custdialog result",result.get(i).getTime().split("@")[1]);
+                                confAppt.setHost(result.get(i).getHost());
+                                confAppt.setTime(result.get(i).getTime());
+                                appointment=result.get(i);
+                            }
+                        }
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                    try{
+                        mapper.save(confAppt);
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                    try{
+                        mapper.delete(appointment);
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
                 }else if(deleting && confirmed) {
                     confAppt= new ConfirmedAppointment();
                     try{
@@ -534,7 +568,9 @@ public class CustomDialogClass extends Dialog implements
                     }catch (Exception e){
                         e.printStackTrace();
                     }
-                }else{
+                }
+                if(!edit){
+                    timeslot=new Timeslot();
                     timeslot.setTime(date.split(" ")[0].toString() + " " + date.split(" ")[1].toString() + " " + date.split(" ")[2].toString() + " " + hours + ":" + mins + amPm + date.split(" ")[5].toString() + " @ " + address);
                     timeslot.setHost(Profile.getCurrentProfile().getName());
                     mapper.save(timeslot);
@@ -547,6 +583,8 @@ public class CustomDialogClass extends Dialog implements
 
         @Override
         protected void onPostExecute(String s) {
+            deleting=false;
+            confirming=false;
             dismiss();
         }
 

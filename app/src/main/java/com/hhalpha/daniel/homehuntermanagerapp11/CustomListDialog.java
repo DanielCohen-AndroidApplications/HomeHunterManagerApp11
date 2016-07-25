@@ -2,6 +2,7 @@ package com.hhalpha.daniel.homehuntermanagerapp11;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -203,7 +204,14 @@ public class CustomListDialog extends Dialog implements
                         bundle.putString("address",address);
                         bundle.putBoolean("available",true);
                         bundle.putBoolean("edit",true);
+
                         CustomDialogClass cdd = new CustomDialogClass(c,bundle);
+                        cdd.setOnDismissListener(new OnDismissListener() {
+                            @Override
+                            public void onDismiss(DialogInterface dialog) {
+                                CustomListDialog.this.dismiss();
+                            }
+                        });
                         cdd.show();
                     }
                 });
@@ -225,6 +233,12 @@ public class CustomListDialog extends Dialog implements
                         bundle.putBoolean("requested",true);
                         bundle.putBoolean("edit",true);
                         CustomDialogClass cdd = new CustomDialogClass(c,bundle);
+                        cdd.setOnDismissListener(new OnDismissListener() {
+                            @Override
+                            public void onDismiss(DialogInterface dialog) {
+                                CustomListDialog.this.dismiss();
+                            }
+                        });
                         cdd.show();
                     }
                 });
@@ -246,6 +260,12 @@ public class CustomListDialog extends Dialog implements
                         bundle.putBoolean("confirmed",true);
                         bundle.putBoolean("edit",true);
                         CustomDialogClass cdd = new CustomDialogClass(c,bundle);
+                        cdd.setOnDismissListener(new OnDismissListener() {
+                            @Override
+                            public void onDismiss(DialogInterface dialog) {
+                                CustomListDialog.this.dismiss();
+                            }
+                        });
                         cdd.show();
                     }
                 });
