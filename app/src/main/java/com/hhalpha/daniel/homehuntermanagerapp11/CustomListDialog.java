@@ -493,6 +493,14 @@ public class CustomListDialog extends Dialog implements
         switch (v.getId()) {
             case R.id.btn_yes:
                 //TODO add intent to activity to add new timeslot
+                CustomDialogClass cdd = new CustomDialogClass(c,bundle);
+                cdd.setOnDismissListener(new OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        CustomListDialog.this.dismiss();
+                    }
+                });
+                cdd.show();
         }
 
     }
