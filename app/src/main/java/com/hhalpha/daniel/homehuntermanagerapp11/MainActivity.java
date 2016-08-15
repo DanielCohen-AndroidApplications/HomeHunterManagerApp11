@@ -237,22 +237,24 @@ public class MainActivity extends Activity {
                     try {
                         Log.v("_dan", summary.getKey());
                         String key = summary.getKey();
-                        S3ObjectInputStream content = s3.getObject("hhproperties", key).getObjectContent();
-                        ObjectMetadata metadata = s3.getObject("hhproperties", key).getObjectMetadata();
+                        if(key.contains("pic1")) {
+                            S3ObjectInputStream content = s3.getObject("hhproperties", key).getObjectContent();
+                            ObjectMetadata metadata = s3.getObject("hhproperties", key).getObjectMetadata();
 //                        Log.v("_dan meta",metadata.getUserMetaDataOf("info").toString());
-                        metadataArrayList.add(metadata.getUserMetaDataOf("info").toString());
-                        metadataArrayList.add(metadata.getUserMetaDataOf("coords").toString());
-                        byte[] bytes = IOUtils.toByteArray(content);
-                        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                            metadataArrayList.add(metadata.getUserMetaDataOf("info").toString());
+                            metadataArrayList.add(metadata.getUserMetaDataOf("coords").toString());
+                            byte[] bytes = IOUtils.toByteArray(content);
+                            Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
 
-                        PropertyListEntry propertyListEntry = new PropertyListEntry(key, bitmap);
-                        propertyListEntry.setPic(bitmap);
-                        propertyListEntry.setPropertyText(key);
-                        if(!addresses.toString().contains(summary.getKey().split("/")[0])) {
-                            propertyListEntries.add(propertyListEntry);
-                            addresses.add(summary.getKey());
+                            PropertyListEntry propertyListEntry = new PropertyListEntry(key, bitmap);
+                            propertyListEntry.setPic(bitmap);
+                            propertyListEntry.setPropertyText(key);
+                            if (!addresses.toString().contains(summary.getKey().split("/")[0])) {
+                                propertyListEntries.add(propertyListEntry);
+                                addresses.add(summary.getKey());
+                            }
+                            Log.v("_dan", addresses.toString());
                         }
-                        Log.v("_dan", addresses.toString());
                     }catch(Exception e){
                         e.printStackTrace();
                     }
