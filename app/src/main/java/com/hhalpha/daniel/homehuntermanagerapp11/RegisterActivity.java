@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.Signature;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.ContactsContract;
 import android.support.v4.app.FragmentActivity;
 import android.util.Base64;
 import android.util.Log;
@@ -97,6 +98,7 @@ public class RegisterActivity extends FragmentActivity {
                     editor.putBoolean("registered", true);
                     editor.putString("loginMethod", "FB");
                     editor.putString("profileName", profile.getName());
+                    editor.putString("phoneNum", ContactsContract.CommonDataKinds.Phone.NUMBER);
 //                editor.putString("idPool","us-east-1:db3a6e00-7c35-4f48-b956-eaf3375a024f");
                     editor.apply();
                     Intent i = new Intent(RegisterActivity.this, MainActivity.class);
