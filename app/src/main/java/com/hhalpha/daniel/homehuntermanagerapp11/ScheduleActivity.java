@@ -349,11 +349,10 @@ public class ScheduleActivity extends Activity {
         }catch(Exception e){
             e.printStackTrace();
         }
-        initializeCalendar();
+        //initializeCalendar();
 
         new retrieveTask().execute();
-        new retrieveApptsTask().execute();
-        new retrieveConfApptsTask().execute();
+
     }
 
     @Override
@@ -377,6 +376,8 @@ public class ScheduleActivity extends Activity {
                     if (dates.get(i).toString().replace("[", "").replace("]", "").contains(dayView.getDate().toString().split(" ")[0] + " " + dayView.getDate().toString().split(" ")[1] + " " + dayView.getDate().toString().split(" ")[2])) {
 //                        statusList.add("available");
 //                        available=true;
+                        Log.v("_dan sched dates",dates.get(i).toString().replace("[", "").replace("]", ""));
+                        Log.v("_dan sched dayview",dayView.getDate().toString());
                         numSlots++;
                         dayView.setBackgroundColor(Color.parseColor("#cca7a7"));
                     }
@@ -388,6 +389,8 @@ public class ScheduleActivity extends Activity {
                     if (appts.get(y).toString().replace("[", "").replace("]", "").contains(dayView.getDate().toString().split(" ")[0] + " " + dayView.getDate().toString().split(" ")[1] + " " + dayView.getDate().toString().split(" ")[2])) {
 //                        statusList.add("requested");
 //                        requested=true;
+                        Log.v("_dan sched appts",appts.get(y).toString().replace("[", "").replace("]", ""));
+                        Log.v("_dan sched dayview",dayView.getDate().toString());
                         numAppts++;
                         dayView.setBackgroundColor(Color.parseColor("#a7a7bb"));
                     }
@@ -396,10 +399,12 @@ public class ScheduleActivity extends Activity {
                 for (int z = 0; z < confAppts.size(); z++) {
 //                    statusList.add("confirmed");
                     apptIndex = z;
-                    Log.v("_dan confAppts" + z, confAppts.get(z).toString());
-                    Log.v("dan dayview get date", dayView.getDate().toString());
+//                    Log.v("_dan confAppts" + z, confAppts.get(z).toString());
+//                    Log.v("dan dayview get date", dayView.getDate().toString());
                     if (confAppts.get(z).toString().replace("[", "").replace("]", "").contains(dayView.getDate().toString().split(" ")[0] + " " + dayView.getDate().toString().split(" ")[1] + " " + dayView.getDate().toString().split(" ")[2])) {
 //                        confirmed=true;
+                        Log.v("_dan sched conf appts",confAppts.get(z).toString().replace("[", "").replace("]", ""));
+                        Log.v("_dan sched dayview",dayView.getDate().toString());
                         numConfAppts++;
                         dayView.setBackgroundColor(Color.parseColor("#00FF00"));
                     }
@@ -408,15 +413,15 @@ public class ScheduleActivity extends Activity {
 
                 //
                 if(numSlots>0||numAppts>0||numConfAppts>0) {
-                    dayView.setText(dayView.getDate().toString().split(" ")[2]+"\n"+numConfAppts + " appointments confirmed!"+ "\n"+numSlots + " timeslots set as available" + "\n" + numAppts + " timeslots awaiting confirmation");
+                    //dayView.setText(dayView.getDate().toString().split(" ")[2]+"\n"+numConfAppts + " appointments confirmed!"+ "\n"+numSlots + " timeslots set as available" + "\n" + numAppts + " timeslots awaiting confirmation");
                     dayView.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             try{
                                 for(int x=0;x<dates.toString().split(",").length;x++){
-                                    Log.v("_dan sched dates",dates.toString().split(",")[x]);
-                                    Log.v("_dan sched dayview",dayView.getDate().toString());
+
                                     if(dates.toString().split(",")[x].contains(dayView.getDate().toString().split(" ")[0]+" "+dayView.getDate().toString().split(" ")[1]+" "+dayView.getDate().toString().split(" ")[2])&&!dateArrayList.toString().contains(dayView.getDate().toString().split(" ")[3])){
+
                                         dateArrayList.add(dates.toString().split(",")[x]);
                                     }
                                 }
@@ -426,8 +431,8 @@ public class ScheduleActivity extends Activity {
                             }
                             try{
                                 for(int x=0;x<appts.toString().split(",").length;x++){
-                                    Log.v("_dan sched appts",appts.toString().split(",")[x]);
                                     if(appts.toString().split(",")[x].contains(dayView.getDate().toString().split(" ")[0]+" "+dayView.getDate().toString().split(" ")[1]+" "+dayView.getDate().toString().split(" ")[2])&&!apptArrayList.toString().contains(dayView.getDate().toString().split(" ")[3])){
+
                                         apptArrayList.add(appts.toString().split(",")[x]);
 //                                        requested=true;
                                     }
@@ -438,8 +443,8 @@ public class ScheduleActivity extends Activity {
                             }
                             try{
                                 for(int x=0;x<confAppts.toString().split(",").length;x++){
-                                    Log.v("_dan sched conf appts",confAppts.toString().split(",")[x]);
                                     if(confAppts.toString().split(",")[x].contains(dayView.getDate().toString().split(" ")[0]+" "+dayView.getDate().toString().split(" ")[1]+" "+dayView.getDate().toString().split(" ")[2])&&!confApptArrayList.contains(dayView.getDate().toString().split(" ")[3])){
+
                                         confApptArrayList.add(confAppts.toString().split(",")[x]);
 //                                        confirmed=true;
                                     }
@@ -552,6 +557,10 @@ public class ScheduleActivity extends Activity {
             return null;
         }
 
+        @Override
+        protected void onPostExecute(String s) {
+            new retrieveApptsTask().execute();
+        }
 
 
     }
@@ -586,10 +595,10 @@ public class ScheduleActivity extends Activity {
             return null;
         }
 
-//        @Override
-//        protected void onPostExecute(String s) {
-//            initializeCalendar();
-//        }
+        @Override
+        protected void onPostExecute(String s) {
+            new retrieveConfApptsTask().execute();
+        }
 
 
     }

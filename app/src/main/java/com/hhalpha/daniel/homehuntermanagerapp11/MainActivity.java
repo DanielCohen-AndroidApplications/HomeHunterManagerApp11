@@ -13,7 +13,9 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.CalendarContract;
 import android.util.Log;
+import android.util.TimeUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
@@ -41,6 +43,7 @@ import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
+import com.amazonaws.util.DateUtils;
 import com.amazonaws.util.IOUtils;
 import com.facebook.AccessToken;
 import com.facebook.FacebookSdk;
@@ -52,6 +55,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -200,15 +204,33 @@ public class MainActivity extends Activity {
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK) {
+            Log.v("_dan on activity","log");
+        }
+
+    }
+
     public void listProperties(View v){
 
     }
     public void goToCalendar(){
-        Intent i = new Intent(MainActivity.this,ScheduleActivity.class);
-        Bundle bundle = new Bundle();
-        bundle.putString("string",new ArrayList<String>(Arrays.asList(metadataArrayList.toString().split(","))).get(itemPosition));
-        i.putExtra("bundle",bundle);
+        Intent i = new Intent(MainActivity.this,NewScheduleActivity2.class);
         startActivity(i);
+//        Calendar beginTime = Calendar.getInstance();
+//        Calendar endTime = Calendar.getInstance();
+//        Intent intent = new Intent(Intent.ACTION_INSERT)
+//                .setData(CalendarContract.Events.CONTENT_URI)
+//                .setType("vnd.android.cursor.item/event")
+//                .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, beginTime.getInstance().getTimeInMillis())
+//                .putExtra(CalendarContract.EXTRA_EVENT_END_TIME, endTime.getInstance().getTimeInMillis())
+//                .putExtra(CalendarContract.Events.TITLE, "Time slot to view "+addresses.get(itemPosition))
+//                .putExtra(CalendarContract.Events.DESCRIPTION, "Free time slot")
+//                .putExtra(CalendarContract.Events.EVENT_LOCATION, addresses.get(itemPosition))
+//                .putExtra(CalendarContract.Events.AVAILABILITY, CalendarContract.Events.AVAILABILITY_FREE)
+//                .putExtra(Intent.EXTRA_EMAIL, "rowan@example.com,trevor@example.com");
+//        startActivityForResult(intent,RESULT_OK);
     }
     public void createNewProperty(View v){
         Intent i= new Intent(MainActivity.this, CreateActivity.class);
