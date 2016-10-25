@@ -7,12 +7,14 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.CalendarContract;
 import android.util.Log;
 import android.util.TimeUtils;
@@ -47,6 +49,7 @@ import com.amazonaws.util.DateUtils;
 import com.amazonaws.util.IOUtils;
 import com.facebook.AccessToken;
 import com.facebook.FacebookSdk;
+import com.facebook.Profile;
 import com.imanoweb.calendarview.CalendarListener;
 import com.imanoweb.calendarview.CustomCalendarView;
 
@@ -82,8 +85,8 @@ public class MainActivity extends Activity {
     File pic1;
     Bitmap bitmapTest;
     FileOutputStream fos;
-    String keyTest;
-
+    String keyTest, profile;
+    SharedPreferences preferences;
     CustomListViewAdapter adapter;
     ArrayList<PropertyListEntry> propertyListEntries;
     ListView listView;
@@ -95,6 +98,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         FacebookSdk.sdkInitialize(getApplicationContext());
+
         try {
             Log.v("_danoncreate",getApplicationContext().getCacheDir().listFiles().toString());
             propertyListEntries = new ArrayList<PropertyListEntry>();
@@ -218,19 +222,6 @@ public class MainActivity extends Activity {
     public void goToCalendar(){
         Intent i = new Intent(MainActivity.this,NewScheduleActivity2.class);
         startActivity(i);
-//        Calendar beginTime = Calendar.getInstance();
-//        Calendar endTime = Calendar.getInstance();
-//        Intent intent = new Intent(Intent.ACTION_INSERT)
-//                .setData(CalendarContract.Events.CONTENT_URI)
-//                .setType("vnd.android.cursor.item/event")
-//                .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, beginTime.getInstance().getTimeInMillis())
-//                .putExtra(CalendarContract.EXTRA_EVENT_END_TIME, endTime.getInstance().getTimeInMillis())
-//                .putExtra(CalendarContract.Events.TITLE, "Time slot to view "+addresses.get(itemPosition))
-//                .putExtra(CalendarContract.Events.DESCRIPTION, "Free time slot")
-//                .putExtra(CalendarContract.Events.EVENT_LOCATION, addresses.get(itemPosition))
-//                .putExtra(CalendarContract.Events.AVAILABILITY, CalendarContract.Events.AVAILABILITY_FREE)
-//                .putExtra(Intent.EXTRA_EMAIL, "rowan@example.com,trevor@example.com");
-//        startActivityForResult(intent,RESULT_OK);
     }
     public void createNewProperty(View v){
         Intent i= new Intent(MainActivity.this, CreateActivity.class);

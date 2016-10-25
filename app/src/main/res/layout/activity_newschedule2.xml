@@ -112,7 +112,8 @@
         android:layout_height="wrap_content"
         android:background="@android:color/white"
         android:clickable="true"
-        android:text="Edit timeslot"
+        android:text="Create available timeslot"
+        android:onClick="createAvailableTimeSlot"
         android:textColor="#5DBCD2"
         android:textStyle="bold" />
 

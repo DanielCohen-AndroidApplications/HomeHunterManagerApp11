@@ -1,12 +1,15 @@
 package com.hhalpha.daniel.homehuntermanagerapp11;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -33,12 +36,14 @@ public class NewScheduleActivity2 extends Activity {
     CognitoSyncManager syncClient;
     Timeslot timeslot;
     CheckBox checkBoxAM, checkBoxPM;
-    String amPm;
+    String amPm,profile;
     Boolean available, requested, confirmed,edit,deleting;
     int clicks;
     Appointment appointment;
     ConfirmedAppointment confAppt;
     Boolean confirming;
+    Bundle bundle;
+    SharedPreferences preferences;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,7 +54,8 @@ public class NewScheduleActivity2 extends Activity {
         //txt_dia.setText(date.split(" ")[0].toString()+" "+date.split(" ")[1].toString()+" "+date.split(" ")[2].toString()+"\n"+address);
         yes = (Button) findViewById(R.id.btn_yes);
         btn_delete=(Button) findViewById(R.id.btn_delete);
-
+        preferences= PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        profile= preferences.getString("profileName","");
         spinnerHours = (Spinner) findViewById(R.id.spinnerHours);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getApplicationContext(),
                 R.array.Hours, android.R.layout.simple_spinner_item);
@@ -140,9 +146,33 @@ public class NewScheduleActivity2 extends Activity {
 
             }
         });
-
+        checkBoxAM.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    amPm="AM";
+                    checkBoxPM.setChecked(false);
+                }
+                if (!isChecked) {
+                    amPm="PM";
+                }
+            }
+        });
+        checkBoxPM.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    amPm="PM";
+                    checkBoxAM.setChecked(false);
+                }
+                if (!isChecked) {
+                    amPm="AM";
+                }
+            }
+        });
     }
-    public void createAvailableTimeSlot(View v){
 
+    public void createAvailableTimeSlot(View v){
+        txt_dia.setText(hours+":"+mins+" "+amPm+" "+day+" "+month+" "+year+" "+profile);
     }
 }
