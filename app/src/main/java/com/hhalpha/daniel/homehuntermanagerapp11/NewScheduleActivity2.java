@@ -14,12 +14,15 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
 import com.amazonaws.mobileconnectors.cognito.CognitoSyncManager;
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBMapper;
+import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBScanExpression;
+import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.PaginatedScanList;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
 import com.amazonaws.regions.Region;
@@ -68,14 +71,24 @@ public class NewScheduleActivity2 extends Activity {
     Bundle bundle;
     SharedPreferences preferences;
     Showing showing;
+    ArrayList<Showing> showings;
+    ArrayList<String> timeSlots;
     File pic1;
     private CognitoCachingCredentialsProvider credentialsProvider;
+    ArrayAdapter<String> timeSlotAdapter;
+    ListView listView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_newschedule2);
         address=getIntent().getExtras().getString("address");
         showing=new Showing();
+        showings=new ArrayList<Showing>();
+        timeSlots=new ArrayList<String>();
+        timeSlotAdapter=new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, timeSlots);
+        listView = (ListView) findViewById(R.id.listView);
+        listView.setAdapter(timeSlotAdapter);
+
         try{
             credentialsProvider = new CognitoCachingCredentialsProvider(
                     getApplicationContext(),
@@ -88,14 +101,16 @@ public class NewScheduleActivity2 extends Activity {
         }catch (Exception e){
             e.printStackTrace();
         }
+        preferences= PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        profile= preferences.getString("profileName","");
+        new retrieveTimeSlots().execute();
         checkBoxPM=(CheckBox) findViewById(R.id.checkBoxPM);
         checkBoxAM=(CheckBox) findViewById(R.id.checkBoxAM);
         txt_dia=(TextView)findViewById(R.id.txt_dia);
         //txt_dia.setText(date.split(" ")[0].toString()+" "+date.split(" ")[1].toString()+" "+date.split(" ")[2].toString()+"\n"+address);
         yes = (Button) findViewById(R.id.btn_yes);
         btn_delete=(Button) findViewById(R.id.btn_delete);
-        preferences= PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        profile= preferences.getString("profileName","");
+
         spinnerHours = (Spinner) findViewById(R.id.spinnerHours);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getApplicationContext(),
                 R.array.Hours, android.R.layout.simple_spinner_item);
@@ -217,7 +232,7 @@ public class NewScheduleActivity2 extends Activity {
         txt_dia.setText(address+hours+":"+mins+" "+amPm+" "+day+" "+month+" "+year+" "+profile);
         //create a map to store user metadata
         showing.setAddress(address);
-        showing.setInfoString(hours+":"+mins+" "+amPm+" "+day+" "+month+" "+year+" "+profile);
+        showing.setInfoString("Available "+hours+":"+mins+" "+amPm+" "+day+" "+month+" "+year+" "+profile);
         new timeSlotTask().execute(showing);
     }
 
@@ -234,6 +249,38 @@ public class NewScheduleActivity2 extends Activity {
             mapper = new DynamoDBMapper(ddbClient);
             mapper.save(params[0]);
             return "";
+        }
+    }
+
+    public class retrieveTimeSlots extends AsyncTask<String,Integer,String>{
+
+        @Override
+        protected String doInBackground(String... params) {
+            syncClient = new CognitoSyncManager(
+                    getApplicationContext(),
+                    Regions.US_EAST_1, // Region
+                    credentialsProvider);
+            credentialsProvider.refresh();
+            ddbClient = new AmazonDynamoDBClient(credentialsProvider);
+            mapper = new DynamoDBMapper(ddbClient);
+            try{
+                DynamoDBScanExpression scanExpression = new DynamoDBScanExpression();
+                PaginatedScanList<Showing> result = mapper.scan(Showing.class, scanExpression);
+                for(int i=0;i<result.size();i++) {
+                    if (result.get(i).getInfoString().contains(profile)&&result.get(i).getAddress().contains(address)){
+                        showings.add(result.get(i));
+                        timeSlots.add(result.get(i).getInfoString());
+                    }
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            timeSlotAdapter.notifyDataSetChanged();
         }
     }
 }
