@@ -2,8 +2,12 @@ package com.hhalpha.daniel.homehuntermanagerapp11;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -16,8 +20,28 @@ import android.widget.TextView;
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
 import com.amazonaws.mobileconnectors.cognito.CognitoSyncManager;
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBMapper;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
+import com.amazonaws.regions.Region;
+import com.amazonaws.regions.Regions;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.iterable.S3Objects;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.S3ObjectInputStream;
+import com.amazonaws.services.s3.model.S3ObjectSummary;
+import com.amazonaws.util.IOUtils;
+import com.facebook.AccessToken;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+import static java.security.AccessController.getContext;
 
 /**
  * Created by Daniel on 10/12/2016.
@@ -26,13 +50,12 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 public class NewScheduleActivity2 extends Activity {
     Button yes,btn_delete;
     TextView txt_dia;
-    AmazonDynamoDBClient ddbClient;
     Spinner spinnerHours, spinnerMinutes, spinnerMonths, spinnerDays, spinnerYears;
     String hours, mins, oldHours,oldMins, date, address, day,month,year;
     DynamoDBMapper mapper;
     AmazonDynamoDB dynamoDB;
+    AmazonDynamoDBClient ddbClient;
     String idPool;
-    CognitoCachingCredentialsProvider credentialsProvider;
     CognitoSyncManager syncClient;
     Timeslot timeslot;
     CheckBox checkBoxAM, checkBoxPM;
@@ -44,10 +67,27 @@ public class NewScheduleActivity2 extends Activity {
     Boolean confirming;
     Bundle bundle;
     SharedPreferences preferences;
+    Showing showing;
+    File pic1;
+    private CognitoCachingCredentialsProvider credentialsProvider;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_newschedule2);
+        address=getIntent().getExtras().getString("address");
+        showing=new Showing();
+        try{
+            credentialsProvider = new CognitoCachingCredentialsProvider(
+                    getApplicationContext(),
+                    "us-east-1:db3a6e00-7c35-4f48-b956-eaf3375a024f", // Identity Pool ID
+                    Regions.US_EAST_1 // Region
+            );
+            Map<String, String> logins = new HashMap<String, String>();
+            logins.put("graph.facebook.com", AccessToken.getCurrentAccessToken().getToken());
+            credentialsProvider.setLogins(logins);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         checkBoxPM=(CheckBox) findViewById(R.id.checkBoxPM);
         checkBoxAM=(CheckBox) findViewById(R.id.checkBoxAM);
         txt_dia=(TextView)findViewById(R.id.txt_dia);
@@ -170,9 +210,30 @@ public class NewScheduleActivity2 extends Activity {
                 }
             }
         });
+
     }
 
     public void createAvailableTimeSlot(View v){
-        txt_dia.setText(hours+":"+mins+" "+amPm+" "+day+" "+month+" "+year+" "+profile);
+        txt_dia.setText(address+hours+":"+mins+" "+amPm+" "+day+" "+month+" "+year+" "+profile);
+        //create a map to store user metadata
+        showing.setAddress(address);
+        showing.setInfoString(hours+":"+mins+" "+amPm+" "+day+" "+month+" "+year+" "+profile);
+        new timeSlotTask().execute(showing);
+    }
+
+    public class timeSlotTask extends AsyncTask<Showing,Integer,String>{
+
+        @Override
+        protected String doInBackground(Showing... params) {
+            syncClient = new CognitoSyncManager(
+                    getApplicationContext(),
+                    Regions.US_EAST_1, // Region
+                    credentialsProvider);
+            credentialsProvider.refresh();
+            ddbClient = new AmazonDynamoDBClient(credentialsProvider);
+            mapper = new DynamoDBMapper(ddbClient);
+            mapper.save(params[0]);
+            return "";
+        }
     }
 }

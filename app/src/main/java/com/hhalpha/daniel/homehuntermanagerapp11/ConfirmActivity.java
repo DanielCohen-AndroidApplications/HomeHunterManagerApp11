@@ -180,10 +180,7 @@ public class ConfirmActivity extends Activity implements OnMapReadyCallback {
                 getApplicationContext(),
                 Regions.US_EAST_1, // Region
                 credentialsProvider);
-        CognitoSyncManager syncClient = new CognitoSyncManager(
-                getApplicationContext(),
-                Regions.US_EAST_1, // Region
-                credentialsProvider);
+
         AmazonDynamoDBClient ddbClient = new AmazonDynamoDBClient(credentialsProvider);
         mapper = new DynamoDBMapper(ddbClient);
         property = new Property();
@@ -394,7 +391,7 @@ public class ConfirmActivity extends Activity implements OnMapReadyCallback {
         protected String doInBackground(String... params) {
 
             try {
-                //DYNAMO: insert attribute into "Music" Table.
+
                 property.setAddress(address);
 
 

@@ -85,7 +85,7 @@ public class MainActivity extends Activity {
     File pic1;
     Bitmap bitmapTest;
     FileOutputStream fos;
-    String keyTest, profile;
+    String keyTest, profile, address;
     SharedPreferences preferences;
     CustomListViewAdapter adapter;
     ArrayList<PropertyListEntry> propertyListEntries;
@@ -93,6 +93,7 @@ public class MainActivity extends Activity {
     ArrayList<String> metadataArrayList;
     int itemPosition;
     AlertDialog.Builder Dialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -129,7 +130,7 @@ public class MainActivity extends Activity {
 
                     Dialog = new AlertDialog.Builder(MainActivity.this);
                     Dialog.setTitle(propertyListEntries.get(position).getPropertyText().replace("/pic1",""));
-
+                    address=propertyListEntries.get(position).getPropertyText().replace("/pic1","");
 
                     Dialog.setPositiveButton("Set viewing schedule", new DialogInterface.OnClickListener()
                     {
@@ -221,6 +222,9 @@ public class MainActivity extends Activity {
     }
     public void goToCalendar(){
         Intent i = new Intent(MainActivity.this,NewScheduleActivity2.class);
+        Bundle bundle = new Bundle();
+        bundle.putString("address",address);
+        i.putExtras(bundle);
         startActivity(i);
     }
     public void createNewProperty(View v){
